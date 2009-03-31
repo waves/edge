@@ -1,18 +1,18 @@
 module Waves
-  
+
   module Resources
-    
+
     StatusCodes = {
       Waves::Dispatchers::NotFoundError => 404
     }
-    
-    
+
+
     module Mixin
-      
+
       attr_reader :request
-      
+
       module ClassMethods
-          
+
         def paths
           unless @paths
             resource = self
@@ -46,7 +46,7 @@ module Waves
           methods.each do | method |
             functor_with_self( method, matcher, &block )
           end
-          paths.module_eval { 
+          paths.module_eval {
             define_method( generator ) { | *args | generate( path, args ) }
           } if generator
         end
@@ -62,26 +62,27 @@ module Waves
         end
         def handler( exception, &block ) ; functor( :handler, exception, &block ) ; end
         def always( &block ) ; define_method( :always, &block ) ; end
-        
+
       end
 
       # this is necessary because you can't define functors within a module because the functor attempts
       # to incorporate the superclass functor table into it's own
       def self.included( resource )
-        
-        resource.module_eval do 
-      
+
+        resource.module_eval do
+
           include ResponseMixin, Functor::Method ; extend ClassMethods
 
           def initialize( request ); @request = request ; end
-      
+
           def process
             begin
-              before ; body = send( request.method ) ; after
+              before ;  body = send( request.method ) ; after
             rescue Waves::Dispatchers::Redirect => e
               raise e
             rescue Exception => e
               response.status = ( StatusCodes[ e.class ] || 500 )
+              e.backtrace
               ( body = handler( e ) ) rescue raise e
               Waves::Logger.warn "Handled #{e.class}: #{e}"
               e.backtrace.each { |t| Waves::Logger.debug "    #{t}" }
@@ -90,13 +91,13 @@ module Waves
             end
             return body
           end
-      
+
           def to( resource )
             resource = case resource
             when Base
               resource
             when Symbol, String
-              begin 
+              begin
                 Waves.main::Resources[ resource ]
               rescue NameError => e
                 Waves::Logger.debug e.to_s
@@ -108,27 +109,27 @@ module Waves
             r = traits.waves.resource = resource.new( request )
             r.process
           end
-          
+
           def redirect( path ) ; request.redirect( path ) ; end
-      
-          # override for resources that may have long-running requests. this helps servers 
+
+          # override for resources that may have long-running requests. this helps servers
           # determine how to handle the request
           def deferred? ; false ; end
-          
+
           before {} ; after {} ; always {}
           # handler( Waves::Dispatchers::Redirect ) { |e| raise e }
-      
+
           %w( post get put delete head ).each do | method |
             on( method ) { not_found }
           end
-                
+
         end
-        
+
       end
 
     end
-      
-    class Base ; include Mixin ; end 
+
+    class Base ; include Mixin ; end
 
   end
 
