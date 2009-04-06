@@ -4,17 +4,17 @@ module Waves
       def self.included( app )
         app.module_eval {
           const_set( :Resources, Module.new {
-            const_set( :Map, Class.new { 
+            const_set( :Map, Class.new {
               include Waves::Resources::Mixin
-              
+
               handler( Exception ) do |e|
                 Waves.debug? ? raise( e ) : Waves::Views::Errors.new( request ).server_error_500
               end
-              
+
               handler( Waves::Dispatchers::NotFoundError ) do |e|
                 Waves.debug? ? raise( e ) : Waves::Views::Errors.new( request ).not_found_404
               end
-              
+
             })
           })
           const_set( :Configurations, Module.new {
@@ -30,8 +30,8 @@ module Waves
               port 80
               host '0.0.0.0'
               #server Waves::Servers::Mongrel
-            
-              application.use Rack::Session::Cookie, 
+
+              application.use Rack::Session::Cookie,
               	:key => 'rack.session',
         		# :domain => 'foo.com',
         		:path => '/',
