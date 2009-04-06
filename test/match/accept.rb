@@ -15,20 +15,36 @@ describe "Matching The Accepts Header" do
   end
 
   feature "Match an implied accept header using the file extension" do
-    Test::Resources::Map.on( :get, true, :accept => :javascript ) {}
+    Test::Resources::Map.on(:get, true, :ext => [:js] ) {}
     get("/foo.js").status.should == 200
+
     get("/foo").status.should == 404
   end
 
-  feature "Match against an array of options" do
-    Test::Resources::Map.on( :get, true, :accept => [ :javascript, :css ] ) {}
-    get("/foo.js").status.should == 200
+  feature "Match a MIME subtype from the Accept header" do
+    Test::Resources::Map.on(:get, true, :accept => :javascript) {}
+
+    get("/foo", {"HTTP_ACCEPT" => "text/javascript"}).status.should == 200
+
     get("/foo").status.should == 404
   end
 
-  feature "Match against a Mime type (rather than subtype)" do
-    Test::Resources::Map.on( :get, true, :accept => :image ) {}
-    get("/foo.png").status.should == 200
+  feature "Match against an array of options from the Accept header" do
+    Test::Resources::Map.on(:get, true, :accept => [:javascript, :css]) {}
+
+    get("/foo", {"HTTP_ACCEPT" => "text/javascript"}).status.should == 200
+    get("/foo", {"HTTP_ACCEPT" => "text/css"}).status.should == 200
+    get("/foo", {"HTTP_ACCEPT" => "text/css,text/javascript"}).status.should == 200
+
+    get("/foo").status.should == 404
+  end
+
+  feature "Match against a MIME-type (rather than subtype) from the Accept header" do
+    Test::Resources::Map.on(:get, true, :accept => :image) {}
+
+    get("/foo", {"HTTP_ACCEPT" => "image/png"}).status.should == 200
+    get("/foo", {"HTTP_ACCEPT" => "image/*"}).status.should == 200
+
     get("/foo").status.should == 404
   end
 
