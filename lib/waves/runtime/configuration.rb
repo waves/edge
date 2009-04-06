@@ -81,7 +81,7 @@ module Waves
       end
 
       # default options
-      debug true
+      debug false
       log :level => :info, :output => $stderr
       reloadable []
       dependencies []

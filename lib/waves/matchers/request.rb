@@ -16,6 +16,7 @@ module Waves
       end
 
       def call( request )
+        # TODO: This should probably be flipped. --rue
         if test( request ) and captured = @uri[ request ]
           request.traits.waves.captured = captured
         end
