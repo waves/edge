@@ -1,7 +1,7 @@
 require "#{here = File.dirname(__FILE__)}/../helpers.rb"
-require 'foundations/classic'
-require 'layers/renderers/erubis'
-require 'layers/renderers/markaby'
+require 'waves/foundations/classic'
+require 'waves/layers/renderers/erubis'
+require 'waves/layers/renderers/markaby'
 require 'fileutils'
 
 

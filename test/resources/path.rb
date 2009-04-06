@@ -1,5 +1,5 @@
 require "#{File.dirname(__FILE__)}/../helpers.rb"
-require "foundations/compact"
+require "waves/foundations/compact"
 
 describe "A path generation method" do
   
