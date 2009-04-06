@@ -100,6 +100,8 @@ module Waves
 
       # TODO parsing must be optimized.
       def self.parse(str)
+        return [] if str.nil?
+
         regexp_1 = Regexp.new(/([^,][^;]*[^,]*)/)
 
         terms = str.scan(regexp_1)
