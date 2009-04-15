@@ -4,7 +4,7 @@ module Waves
 
     class Request < Base
 
-      def initialize( options )
+      def initialize(options)
         @uri = Matchers::URI.new(options)
 
         @constraints = {
@@ -16,8 +16,7 @@ module Waves
       end
 
       def call( request )
-        # TODO: This should probably be flipped. --rue
-        if test( request ) and captured = @uri[ request ]
+        if test( request ) and captured = @uri.call(request)
           request.traits.waves.captured = captured
         end
       end

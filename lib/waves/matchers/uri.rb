@@ -10,7 +10,7 @@ module Waves
       end
 
       def call( request )
-        @path.call( request ) if test( request )
+        test(request) and @path.call(request)
       end
 
     end
