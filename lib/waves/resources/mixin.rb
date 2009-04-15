@@ -81,6 +81,7 @@ module Waves
             rescue Waves::Dispatchers::Redirect => e
               raise e
             rescue Exception => e
+              p :raised, e, e.backtrace, e.message if $DEBUG
               response.status = ( StatusCodes[ e.class ] || 500 )
               ( body = handler( e ) ) rescue raise e
               Waves::Logger.warn "Handled #{e.class}: #{e}"
