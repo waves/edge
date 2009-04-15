@@ -84,32 +84,45 @@ module Waves
       def =~(arg) ; self.include? arg ; end
       def ===(arg) ; self.include? arg ; end
 
+      # Check these Accepts against constraints.
+      #
       def include?(arg)
-        return arg.any? { |pat| self.include?( pat ) } if arg.is_a? Array
-        arg = arg.to_s.split('/')
-        self.any? do |entry|
-          false if entry == '*/*' or entry == '*'
+        return arg.any? {|pat| self.include? pat } if arg.kind_of? Array
+
+        arg = arg.to_s.split "/"
+
+        any? {|entry|
+          # @todo Is this right? --rue
+          next false if entry == '*/*' or entry == '*'
+
           entry = entry.split('/')
-          if arg.size == 1 # implicit wildcard in arg
+
+          if arg.size == 1      # Implicit wildcard matches either
             arg[0] == entry[0] or arg[0] == entry[1]
+          elsif arg[1] == "*"   # Any subtype
+            arg[0] == entry[0]
           else
             arg == entry
           end
-        end
+        }
       end
 
-      # TODO parsing must be optimized.
+      # TODO  parsing must be optimized. This parses Accept,
+      #       lang and charset
+      #
       def self.parse(str)
         return [] if str.nil?
 
-        regexp_1 = Regexp.new(/([^,][^;]*[^,]*)/)
+        terms = str.scan /([^,][^;]*[^,]*)/
+        terms.map! {|t| extract_term_and_value t.to_s }
 
-        terms = str.scan(regexp_1)
-        terms = terms.map{ |t| extract_term_and_value(t.to_s) }
         sorted_terms = terms.sort do |term1, term2|
           term2[1] <=> term1[1]
         end
-        sorted_terms.inject(self.new){|value, terms| value << terms[0].split(',').map{|x| x.strip} }.flatten.uniq
+
+        sorted_terms.inject(new) {|value, terms|
+          value << terms[0].split(',').map {|x| x.strip }
+        }.flatten.uniq
       end
 
       def self.extract_term_and_value(txt)
@@ -119,43 +132,71 @@ module Waves
         [res[0], q]
       end
 
-      #def self.parse(string)
-      #  string.split(',').inject(self.new) { |a, entry| a << entry.split( ';' ).first.strip; a }
-      #end
-
-      def default
-        #return 'text/html' if self.include?('text/html')
-        #find { |entry| ! entry.match(/\*/) } || 'text/html'
-        return 'text/html' if self.size == 0
-        return self.first
+      def default()
+        return "text/html" if empty?
+        first
       end
 
     end
 
-    ## this is a hack - need to incorporate browser variations for "accept" here ...
-    ## def accept ; @accept ||= Accept.parse(@request.env['HTTP_ACCEPT']).unshift( Waves.config.mime_types[ path ] ).compact.uniq ; end
-    ## def accept ; @accept ||= Accept.parse( Waves.config.mime_types[ path.downcase ] || 'text/html' ) ; end
-
-    # Parsed Accept header
+    # Requested representation MIME type
     #
     # RFC 2616 section 14.1.
     #
+    # A file extension takes precedence over the Accept
+    # header; the Accept is ignored.
+    #
+    # The absence of a file extension is indicated using
+    # the special MIME type MimeTypes::Undefined, which
+    # allows specialised handling thereof. The resource
+    # must specifically accept Undefined for it to have
+    # an effect.
+    #
+    # @see  matchers/accept.rb
+    # @see  runtime/mime_types.rb for the actual definition
+    #       of the Undefined type.
+    #
     def accept()
-      @accept ||= Accept.parse(@request.env['HTTP_ACCEPT'])
+      return @accept if @accept
+
+      if ext
+        @accept = Accept[MimeTypes[ext]]
+        return @accept
+      end
+
+      @accept = Accept.parse @request.env["HTTP_ACCEPT"]
+      @accept.unshift Mime::Undefined
     end
 
-    # File extension, without leading dot.
+    # Requested charset(s).
+    #
+    # @see  matchers/accept.rb
+    #
+    def accept_charset()
+      @charset ||= Accept.parse(@request.env['HTTP_ACCEPT_CHARSET'])
+    end
+
+    # Requested language(s).
+    #
+    # @see  matchers/accept.rb
+    #
+    def accept_language()
+      @lang ||= Accept.parse(@request.env['HTTP_ACCEPT_LANGUAGE'])
+    end
+
+    # File extension, with leading dot.
     #
     # Usable for MIME lookups too.
     #
+    # @todo Drop the leading dot?
+    #
     def ext()
-      @ext ||= File.extname(path)
-    end
+      return @ext if @ext
 
-    def accept_charset ; @charset ||= Accept.parse(@request.env['HTTP_ACCEPT_CHARSET']) ; end
-    def accept_language ; @lang ||= Accept.parse(@request.env['HTTP_ACCEPT_LANGUAGE']) ; end
-    # adding accept_encoding
-    # def accept_encoding ; @enc ||= Accept.parse(@request.env['HTTP_ACCEPT_ENCODING']) ; end
+      e = File.extname path
+
+      @ext = if e.empty? then nil else e end
+    end
 
     module Utilities
 
