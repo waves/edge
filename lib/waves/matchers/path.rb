@@ -56,7 +56,7 @@ module Waves
 
       # just a little helper method
       def extract_path( request )
-        request.traits.waves.path ||= request.path.scan(/[^\/]+/).map { |e| Rack::Utils.unescape(e) }
+        request.traits.waves.path ||= request.path.chomp(request.ext).scan(/[^\/]+/).map { |e| Rack::Utils.unescape(e) }
       end
 
     end
