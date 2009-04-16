@@ -14,27 +14,47 @@ describe "Matching Query Parameters" do
   end
 
   feature "Test for a query parameter using true" do
-    Test::Resources::Map.on( :get, true, :query => { :bar => true }) {}
-    get("/foo?bar=baz").status.should == 200
-    get("/foo").status.should == 404
+    Test::Resources::Map.on(:get, ["foo"], :accept => "text/plain",
+                                           :query => {:bar => true}) { }
+
+    resp = get "/foo?bar=baz", "HTTP_ACCEPT" => "text/plain"
+    resp.status.should == 200
+
+    resp = get "/foo", "HTTP_ACCEPT" => "text/plain"
+    resp.status.should == 404
   end
 
   feature "Test that a query parameter matches a regexp" do
-    Test::Resources::Map.on( :get, true, :query => { :bar => /\d+/ }) {}
-    get("/foo?bar=123").status.should == 200
-    get("/foo?bar=baz").status.should == 404
+    Test::Resources::Map.on(:get, ["foo"], :accept => "text/plain",
+                                           :query => {:bar => /\d+/}) { }
+
+    resp = get "/foo?bar=123", "HTTP_ACCEPT" => "text/plain"
+    resp.status.should == 200
+
+    resp = get "/foo?bar=baz", "HTTP_ACCEPT" => "text/plain"
+    resp.status.should == 404
   end
 
   feature "Test that a query parameter matches a string" do
-    Test::Resources::Map.on( :get, true, :query => { :bar => '123' }) {}
-    get("/foo?bar=123").status.should == 200
-    get("/foo?bar=baz").status.should == 404
+    Test::Resources::Map.on(:get, ["foo"], :accept => "text/plain",
+                                           :query => {:bar => "123"}) { }
+
+    resp = get "/foo?bar=123", "HTTP_ACCEPT" => "text/plain"
+    resp.status.should == 200
+
+    resp = get "/foo?bar=baz", "HTTP_ACCEPT" => "text/plain"
+    resp.status.should == 404
   end
 
   feature "Test that a query parameter satisfies a lambda condition" do
-    Test::Resources::Map.on( :get, true, :query => { :bar => lambda { |x| x == '123' } }) {}
-    get("/foo?bar=123").status.should == 200
-    get("/foo?bar=baz").status.should == 404
+    Test::Resources::Map.on(:get, ["foo"], :accept => "text/plain",
+                                           :query => {:bar => lambda {|x| x == "123" }}) { }
+
+    resp = get "/foo?bar=123", "HTTP_ACCEPT" => "text/plain"
+    resp.status.should == 200
+
+    resp = get "/foo?bar=baz", "HTTP_ACCEPT" => "text/plain"
+    resp.status.should == 404
   end
 
 end
