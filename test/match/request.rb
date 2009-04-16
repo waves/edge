@@ -4,7 +4,7 @@ require "test/helpers.rb"
 require "waves/foundations/compact"
 require "waves/matchers/request"
 
-describe "Top-level request matcher with no path given" do
+describe "Top-level request matcher" do
   before do
     Test = Module.new { include Waves::Foundations::Compact }
     Waves << Test
@@ -15,7 +15,10 @@ describe "Top-level request matcher with no path given" do
     Object.instance_eval { remove_const(:Test) if const_defined?(:Test) }
   end
 
-  feature "always matches and returns {} if no host/port/scheme given either" do
+  # @todo Change these to mocks to ensure we really are dealing
+  #       with a non-constructed URI matcher.
+
+  feature "matches any URI, returning {}, if URI matcher omitted" do
     m = Waves::Matchers::Request.new  :path => nil,
                                       :host => nil,
                                       :port => nil,
@@ -24,64 +27,17 @@ describe "Top-level request matcher with no path given" do
     request = Waves::Request.new env("http://example.com/moo",
                                      :method => "GET",
                                      "HTTP_ACCEPT" => "text/html")
-
     m.call(request).should == {}
-  end
-
-  feature "matches returning {} when all of given host/port/scheme match" do
-    m = Waves::Matchers::Request.new  :path => nil,
-                                      :host => "example.com",
-                                      :port => nil,
-                                      :scheme => nil
-
-    n = Waves::Matchers::Request.new  :path => nil,
-                                      :host => nil,
-                                      :port => nil,
-                                      :scheme => "http"
-
-    o = Waves::Matchers::Request.new  :path => nil,
-                                      :host => nil,
-                                      :port => nil,
-                                      :scheme => "http"
-
-    q = Waves::Matchers::Request.new  :path => nil,
-                                      :host => "example.com",
-                                      :port => 80,
-                                      :scheme => "http"
-
-    request = Waves::Request.new env("http://example.com/moo",
-                                     :method => "GET",
-                                     "HTTP_ACCEPT" => "text/html")
-
-    m.call(request).should == {}
-    n.call(request).should == {}
-    o.call(request).should == {}
-    q.call(request).should == {}
-  end
-
-  feature "returns false if either host, port or scheme fail to match when given" do
-    m = Waves::Matchers::Request.new  :path => nil,
-                                      :host => "example.com",
-                                      :port => nil,
-                                      :scheme => nil
-
-    n = Waves::Matchers::Request.new  :path => nil,
-                                      :host => nil,
-                                      :port => nil,
-                                      :scheme => "https"
-
-    o = Waves::Matchers::Request.new  :path => nil,
-                                      :host => nil,
-                                      :port => 8080,
-                                      :scheme => nil
 
     request = Waves::Request.new env("http://example2.com/moo",
                                      :method => "GET",
                                      "HTTP_ACCEPT" => "text/html")
+    m.call(request).should == {}
 
-    m.call(request).should == nil
-    n.call(request).should == nil
-    o.call(request).should == nil
+    request = Waves::Request.new env("http://example2.com:8008/moo",
+                                     :method => "GET",
+                                     "HTTP_ACCEPT" => "text/html")
+    m.call(request).should == {}
   end
 end
 
