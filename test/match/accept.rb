@@ -54,18 +54,6 @@ describe "Accept header matching" do
     resp.body.should == "fortran"
   end
 
-  feature "allows multiple MIMEs to be accepted for one representation" do
-    Test::Resources::Map.on(:get,
-                            ["foo"],
-                            :accept => ["text/javascript", "text/fortran"]) { }
-
-    resp = get "/foo", "HTTP_ACCEPT" => "text/javascript"
-    resp.status.should == 200
-
-    resp = get "/foo", "HTTP_ACCEPT" => "text/fortran"
-    resp.status.should == 200
-  end
-
   feature "matches for absent extension if MimeTypes::Undefined is :accepted" do
     Test::Resources::Map.on(:get,
                             ["foo"],
@@ -168,6 +156,27 @@ describe "Accept header matching" do
 
     resp = get "/foo", "HTTP_ACCEPT" => "*"
     resp.status.should == 404
+  end
+
+  feature "allows multiple MIMEs to be accepted for one representation" do
+    Test::Resources::Map.on(:get,
+                            ["foo"],
+                            :accept => ["text/javascript",
+                                        :application,
+                                        "text/fortran",
+                                        :png]) { }
+
+    resp = get "/foo", "HTTP_ACCEPT" => "text/javascript"
+    resp.status.should == 200
+
+    resp = get "/foo", "HTTP_ACCEPT" => "text/fortran"
+    resp.status.should == 200
+
+    resp = get "/foo", "HTTP_ACCEPT" => "image/png"
+    resp.status.should == 200
+
+    resp = get "/foo", "HTTP_ACCEPT" => "application/xhtml+xml"
+    resp.status.should == 200
   end
 
 # feature handles FF, IE Opera Safari stupid Accept
