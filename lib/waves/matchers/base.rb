@@ -1,5 +1,4 @@
 module Waves
-
   module Matchers
 
     class Base
@@ -10,6 +9,10 @@ module Waves
       #
       # Matchers may override in their #call method, call
       # back into #test() with a subconstraint etc.
+      #
+      # @todo This could maybe be optimised by detecting
+      #       empty constraints before calling. Not high
+      #       importance. --rue
       #
       def test(request)
         constraints.all? {|key, val|
