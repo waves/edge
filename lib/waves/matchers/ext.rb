@@ -33,13 +33,7 @@ module Waves
       # @see  Ext#initialize for information.
       #
       def call(request)
-        return true if @constraints[:ext].empty?
-
-        if request.ext.empty?
-          return true if @constraints[:noext]
-          return false
-        end
-
+        return @constraints[:noext] unless request.ext
         return @constraints[:ext].any? {|ext| ext == request.ext }
       end
 
