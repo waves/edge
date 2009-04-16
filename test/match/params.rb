@@ -7,8 +7,8 @@ describe "A resource that has matched a request" do
     Test = Module.new { include Waves::Foundations::Compact }
     Waves << Test
 
-    @request = Waves::Request.new( env('http://localhost/baz?bar=7', :method => 'GET' ) )
-    Test::Resources::Map.on( :get, [ :foo ] ) {}
+    @request = Waves::Request.new( env('http://localhost/baz?bar=7', :method => 'GET', "HTTP_ACCEPT" => "text/html" ) )
+    Test::Resources::Map.on(:get, [:foo], :accept => "text/html") { }
     @resource = Test::Resources::Map.new( @request )
     @resource.get
   end

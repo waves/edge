@@ -6,11 +6,13 @@ module Waves
 
       attr_accessor :constraints
 
-      def []( *args ) ; call( *args ) ; end
-
-      # used to provide consisting matching logic across all matchers
-      def test( request )
-        constraints.all? do | key, val |
+      # Basic matching mechanism.
+      #
+      # Matchers may override in their #call method, call
+      # back into #test() with a subconstraint etc.
+      #
+      def test(request)
+        constraints.all? {|key, val|
           if val.nil? or val == true
             true
           else
@@ -20,7 +22,21 @@ module Waves
               val == request.send( key ) or val === request.send( key ) or request.send( key ) === val
             end
           end
-        end
+        }
+      end
+
+      # Proc-like interface
+      #
+      # Default--this is usually overridden.
+      #
+      def call(request)
+        test request
+      end
+
+      # Proc-like interface
+      #
+      def [](request)
+        call request
       end
 
     end

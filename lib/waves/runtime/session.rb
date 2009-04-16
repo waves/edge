@@ -27,6 +27,8 @@ module Waves
       @data[key] = val
     end
 
+    # invalidate the whole session
+    def clear ; @data.clear ; end
 
   end
 

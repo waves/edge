@@ -52,9 +52,7 @@ require 'waves/caches/simple'
 
 # waves URI mapping
 require 'waves/matchers/base'
-require "waves/matchers/ext"
 require 'waves/matchers/accept'
-require 'waves/matchers/content_type'
 require 'waves/matchers/path'
 require 'waves/matchers/query'
 require 'waves/matchers/traits'

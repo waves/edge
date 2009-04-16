@@ -7,10 +7,10 @@ module Waves
       # Takes a Waves::Request and returns a Waves::Response
       #
       def safe(request)
-        # Default content type (overridable by resources)
-        request.response.content_type =  Waves.config.mime_types[request.ext] || "text/html"
+        # Safeish default
+        request.response.content_type = "text/html"
 
-        resource = Waves.config.resource.new( request )
+        resource = Waves.config.resource.new request
 
         # TODO: Get rid of this? --rue
         if request.response.body.empty?

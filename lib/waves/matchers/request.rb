@@ -4,20 +4,19 @@ module Waves
 
     class Request < Base
 
-      def initialize( options )
-        @uri = Matchers::URI.new( options )
+      def initialize(options)
+        @uri = Matchers::URI.new(options)
+
         @constraints = {
-          :content_type => Matchers::ContentType.new( options[ :content_type ] ),
-          :accept => Matchers::Accept.new( options ),
           :query => Matchers::Query.new( options[:query] ),
-          :traits => Matchers::Traits.new( options[:traits] ),
-          :ext => Matchers::Ext.new( options[:ext] )
+          :traits => Matchers::Traits.new( options[:traits] )
         }
+
+        @constraints[:accept] = Matchers::Accept.new(options) rescue nil
       end
 
       def call( request )
-        # TODO: This should probably be flipped. --rue
-        if test( request ) and captured = @uri[ request ]
+        if test( request ) and captured = @uri.call(request)
           request.traits.waves.captured = captured
         end
       end
