@@ -82,6 +82,16 @@ describe "File extension matching" do
 
     (!!m.call(request)).should == false
   end
+
+  feature "matches absence of extension, returning true, if Array contains empty String" do
+    m = Waves::Matchers::Ext.new [:js, :html, ""]
+
+    request = Waves::Request.new env("http://example.com/moo",
+                                     :method => "GET",
+                                     "HTTP_ACCEPT" => "text/javascript")
+
+    (!!m.call(request)).should == true
+  end
 end
 
 describe "File extension matching in conjunction with Accept matching" do
@@ -93,6 +103,16 @@ describe "File extension matching in conjunction with Accept matching" do
   after do
     Waves.applications.clear
     Object.instance_eval { remove_const(:Test) if const_defined?(:Test) }
+  end
+
+  feature "matches absence of extension, returning true, if Array contains empty String" do
+    m = Waves::Matchers::Ext.new [:js, :html, ""]
+
+    request = Waves::Request.new env("http://example.com/moo",
+                                     :method => "GET",
+                                     "HTTP_ACCEPT" => "text/javascript")
+
+    (!!m.call(request)).should == true
   end
 end
 
