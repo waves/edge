@@ -11,12 +11,19 @@ module Waves
       #
       # As a special case, if the extension Array contains
       # the empty String "", the matcher will match absence
-      # of an extension.
+      # of an extension. The empty String MUST NOT be by
+      # itself.
       #
       # @todo Enforce MIME lookup success? --rue
       #
       def initialize(ext)
         raise ArgumentError, "No Ext constraints!" unless ext
+
+        # @todo Ridiculous 1.8 semantics, Array uses #each if
+        #       present, but delete works equally here. So it
+        #       does not matter whether we have "" or [""] at
+        #       this point, both work. This must change for
+        #       1.9 compatibility. --rue
 
         ext = Array(ext)
         raise ArgumentError, "No Ext constraints!" if ext.empty?
