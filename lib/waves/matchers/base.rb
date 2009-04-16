@@ -28,6 +28,18 @@ module Waves
         }
       end
 
+      # Convenience for building matchers.
+      #
+      # Errors from blocks ignored in general.
+      #
+      # @todo Only ArgumentError? --rue
+      #
+      def maybe()
+        yield
+      rescue
+        # No need to act
+      end
+
       # Proc-like interface
       #
       # Default--this is usually overridden.
