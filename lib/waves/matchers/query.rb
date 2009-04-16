@@ -8,6 +8,8 @@ module Waves
 
       # Create query matcher or fail.
       #
+      # @todo Should map Symbols to Strings here. --rue
+      #
       def initialize(pattern)
         raise ArgumentError, "No Query constraints!" unless pattern
         @pattern = pattern
@@ -21,7 +23,7 @@ module Waves
           #       Proc would be useful just given nil from
           #       a nonexisting key. We just fail in those
           #       cases for now. --rue
-          if given = request.query[key]
+          if given = request.query[key.to_s]
             val == true or val === given or (val.call(given) rescue false)
           end
         }
