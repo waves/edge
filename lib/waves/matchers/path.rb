@@ -1,12 +1,18 @@
 module Waves
 
   module Matchers
-    
+
     class Path < Base
-      
+
       # Takes an array of pattern elements ... coming soon, support for formatted strings!
-      def initialize( pattern ) ; @pattern = pattern  ; end
-      
+      #
+      # Empty Array means no path, but nil is not processed.
+      #
+      def initialize(pattern)
+        raise ArgumentError, "Path is nil!" unless pattern
+        @pattern = pattern
+      end
+
       # returns a hash of captured values
       def call( request )
         if @pattern.is_a? Array
@@ -17,7 +23,7 @@ module Waves
             case want
             when true # same as a Range of 1..-1
               path = [] unless path.empty?
-            when Range 
+            when Range
               if want.end == -1
                 path = [] if path.length >= want.begin
               else
@@ -52,7 +58,7 @@ module Waves
         end
       end
 
-      # private 
+      # private
 
       # just a little helper method
       def extract_path( request )
@@ -60,8 +66,8 @@ module Waves
       end
 
     end
-    
-    
+
+
   end
 
 end

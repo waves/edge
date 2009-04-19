@@ -1,5 +1,6 @@
-module Waves
+require "waves/matchers/base"
 
+module Waves
   module Matchers
 
     # @todo Rename to Negotiation? --rue
