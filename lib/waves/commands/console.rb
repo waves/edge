@@ -10,7 +10,7 @@ Choice.options do
     desc 'Defaults to development.'
     cast Symbol
   end
-  separator ''  
+  separator ''
   option :startup do
     short '-s'
     long '--startup'
@@ -20,7 +20,7 @@ Choice.options do
   separator ''
 end
 
-require 'runtime/console'
+require 'waves/runtime/console'
 
 begin
   console = Waves::Console.load( Choice.choices )
