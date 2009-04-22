@@ -17,19 +17,24 @@ module Waves
 
       end
 
-      # Resource definition block.
+      # Discrete set of methods to include globally.
       #
-      def resource(name, &block)
-        # Be extra clear
-        res = Class.new REST::Resource, &block
-        Object.const_set name, res
+      module ConvenienceMethods
+
+        # Resource definition block.
+        #
+        def resource(name, &block)
+          res = Class.new REST::Resource, &block
+          Object.const_set name, res
+        end
+
       end
 
-    end
+    end   # REST
 
   end
 end
 
 # We do not play around.
-include Waves::Foundations::REST
+include Waves::Foundations::REST::ConvenienceMethods
 
