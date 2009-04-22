@@ -1,3 +1,5 @@
+require "waves/resources/mixin"
+
 module Waves
   module Foundations
 
@@ -9,12 +11,26 @@ module Waves
       # methods.
       #
       class Resource
+        # @todo Direct include/extend to avoid having to use
+        #       Mixin. It is cumbersome to glue in at this
+        #       stage. --rue
+        include ResponseMixin, Functor::Method
+        extend  Resources::Mixin::ClassMethods
 
         # Viewability definition block
         #
+        # @see  .representation
+        #
         def self.viewable(&block)
+          instance_eval &block
         end
 
+        # Representation definition block
+        #
+        def self.representation(*types, &block)
+          # @todo Faking it.
+          on(:get, true, :accept => types) {}
+        end
       end
 
       # Discrete set of methods to include globally.
