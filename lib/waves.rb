@@ -60,6 +60,7 @@ require 'waves/matchers/traits'
 require 'waves/matchers/uri'
 require 'waves/matchers/request'
 require 'waves/matchers/resource'
+require 'waves/matchers/requested'
 require 'waves/resources/paths'
 require 'waves/resources/mixin'
 

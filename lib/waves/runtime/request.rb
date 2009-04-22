@@ -143,6 +143,9 @@ module Waves
     #
     # RFC 2616 section 14.1.
     #
+    def accept
+      @accept ||= Accept.parse(@request.env['HTTP_ACCEPT'])
+    end
     # A file extension takes precedence over the Accept
     # header; the Accept is ignored.
     #
@@ -156,16 +159,16 @@ module Waves
     # @see  runtime/mime_types.rb for the actual definition
     #       of the Undefined type.
     #
-    def accept()
+    def requested()
       return @accept if @accept
-
       if ext
         @accept = Accept[MimeTypes[ext]]
         return @accept
       end
 
       @accept = Accept.parse @request.env["HTTP_ACCEPT"]
-      @accept.unshift Mime::Undefined
+      @accept.<< Mime::Undefined
+
     end
 
     # Requested charset(s).
