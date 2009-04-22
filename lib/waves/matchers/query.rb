@@ -2,20 +2,35 @@ module Waves
 
   module Matchers
 
+    # Query parameter matching.
+    #
     class Query < Base
-      
-      def initialize( pattern ) ; @pattern = ( pattern or {} ) ; end
-    
-      def call( request )
-        @pattern.all? do | key, val |
-          key = key.to_s
-          ( ( val.respond_to?(:call) and val.call( request.query[ key ] ) ) or 
-            ( request.query[ key ] and ( ( val == true ) or ( val === request.query[ key ] ) ) ) )
-        end
+
+      # Create query matcher or fail.
+      #
+      # @todo Should map Symbols to Strings here. --rue
+      #
+      def initialize(pattern)
+        raise ArgumentError, "No Query constraints!" unless pattern
+        @pattern = pattern
       end
-      
+
+      # Match query parameters.
+      #
+      def call(request)
+        @pattern.all? {|key, val|
+          # @todo Is this right? I do not see how even a
+          #       Proc would be useful just given nil from
+          #       a nonexisting key. We just fail in those
+          #       cases for now. --rue
+          if given = request.query[key.to_s]
+            val == true or val === given or (val.call(given) rescue false)
+          end
+        }
+      end
+
     end
-    
+
   end
-  
+
 end

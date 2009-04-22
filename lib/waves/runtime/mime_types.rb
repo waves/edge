@@ -20,6 +20,18 @@ module Waves
 
   end
 
+
+  module Mime
+    # Undefined MIME type.
+    #
+    # Primarily used to indicate the absence of a file
+    # extension.
+    #
+    # @see  Request#accept
+    #
+    Undefined = "application/vnd.com.rubywaves.undefined"
+  end
+
   MIME_TYPES = {
     ".skd"=>"application/x-koan",
     ".el"=>"text/x-script.elisp",
@@ -531,6 +543,9 @@ module Waves
     ".mif"=>"application/x-mif"
   }
 
+  # Unspecified MIME type
+  #
+  # Generally used 
 
 end
 

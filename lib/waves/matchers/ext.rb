@@ -11,19 +11,27 @@ module Waves
       #
       # As a special case, if the extension Array contains
       # the empty String "", the matcher will match absence
-      # of an extension.
+      # of an extension. The empty String MUST NOT be by
+      # itself.
       #
-      # TODO: Enforce MIME lookup success? --rue
+      # @todo Enforce MIME lookup success? --rue
       #
       def initialize(ext)
-        unless ext
-          @constraints = {:ext => [], :noext => false}
-          return
-        end
+        raise ArgumentError, "No Ext constraints!" unless ext
 
-        noext = ext.delete ""
-        ext = Array(ext).map {|e| ".#{e.to_s}" }
+        # @todo Ridiculous 1.8 semantics, Array uses #each if
+        #       present, but delete works equally here. So it
+        #       does not matter whether we have "" or [""] at
+        #       this point, both work. This must change for
+        #       1.9 compatibility. --rue
 
+        ext = Array(ext)
+        raise ArgumentError, "No Ext constraints!" if ext.empty?
+
+        noext = ext.delete ""   # Absent extension
+        ext.map! {|e| ".#{e.to_s}" }
+
+        # @todo Could maybe drop an empty ext. --rue
         @constraints = {:ext => ext, :noext => noext}
       end
 
@@ -32,13 +40,7 @@ module Waves
       # @see  Ext#initialize for information.
       #
       def call(request)
-        return true if @constraints[:ext].empty?
-
-        if request.ext.empty?
-          return true if @constraints[:noext]
-          return false
-        end
-
+        return @constraints[:noext] unless request.ext
         return @constraints[:ext].any? {|ext| ext == request.ext }
       end
 

@@ -1,23 +1,29 @@
 module Waves
-
   module Matchers
 
+    # Top-level matcher nesting all others.
+    #
     class Request < Base
 
-      def initialize( options )
-        @uri = Matchers::URI.new( options )
-        @constraints = {
-          :content_type => Matchers::ContentType.new( options[ :content_type ] ),
-          :accept => Matchers::Accept.new( options ),
-          :query => Matchers::Query.new( options[:query] ),
-          :traits => Matchers::Traits.new( options[:traits] ),
-          :ext => Matchers::Ext.new( options[:ext] )
-        }
+      # Create the top nested set of matchers.
+      #
+      def initialize(options)
+        # Simplest to fake it if there is no URL to match
+        @uri = Matchers::URI.new(options) rescue lambda { {} }
+
+        @constraints = {}
+
+        # These are essentially optional
+        maybe { @constraints[:accept] = Matchers::Accept.new options }
+        maybe { @constraints[:ext]    = Matchers::Ext.new options[:ext] }
+        maybe { @constraints[:query]  = Matchers::Query.new options[:query] }
+        maybe { @constraints[:traits] = Matchers::Traits.new options[:traits] }
       end
 
-      def call( request )
-        # TODO: This should probably be flipped. --rue
-        if test( request ) and captured = @uri[ request ]
+      # Process all matchers for request.
+      #
+      def call(request)
+        if captured = @uri.call(request) and test(request)
           request.traits.waves.captured = captured
         end
       end

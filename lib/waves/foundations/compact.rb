@@ -26,6 +26,7 @@ module Waves
               resource app::Resources::Map
             })
             const_set( :Production, Class.new( self::Development ) {
+              debug false
               log :level => :error, :output => ( "log.#{$$}" ), :rotation => :weekly
               port 80
               host '0.0.0.0'
