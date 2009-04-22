@@ -3,13 +3,25 @@ module Waves
 
     module REST
 
+      # Base class to use for resources.
+      #
+      # Mainly here for simple access to some convenience
+      # methods.
+      #
       class Resource
+
+        # Viewability definition block
+        #
+        def self.viewable(&block)
+        end
+
       end
 
       # Resource definition block.
       #
       def resource(name, &block)
-        res = Class.new &block
+        # Be extra clear
+        res = Class.new REST::Resource, &block
         Object.const_set name, res
       end
 
