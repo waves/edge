@@ -142,3 +142,12 @@ task( :test ) do
   puts command = "bacon #{paths.join(' ')}"
   system command
 end
+
+require "rubygems"
+  require "micronaut/rake_task"
+
+desc "Run all specs."
+Micronaut::RakeTask.new :spec do |t|
+ t.pattern = "spec/**/*_spec.rb"
+end
+
