@@ -1,6 +1,8 @@
 require "rubygems"
   require "micronaut"
 
+Micronaut.configure {|config| config.mock_with :rr }
+
 # Framework libs go in front
 #
 $LOAD_PATH.unshift File.expand_path(File.join(File.dirname(__FILE__), "..", "lib"))
