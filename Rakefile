@@ -136,18 +136,24 @@ task( :setup ) do
   puts "rake setup task completed... happy hacking!"
 end
 
-desc "Run all specifications and tests."
+namespace :specs do
+  require "rubygems"
+    require "micronaut/rake_task"
+
+  # Sneaky hidy.
+  desc "Run all specs."
+  Micronaut::RakeTask.new :run do |t|
+   t.pattern = "spec/**/*_spec.rb"
+  end
+end
+
+desc "Run all old-style tests and specs under test/"
 task( :test ) do
   paths = FileList['test/**/*.rb'].exclude('**/helpers.rb')
   puts command = "bacon #{paths.join(' ')}"
   system command
 end
 
-require "rubygems"
-  require "micronaut/rake_task"
-
-desc "Run all specs."
-Micronaut::RakeTask.new :spec do |t|
- t.pattern = "spec/**/*_spec.rb"
-end
+desc "Run all specs and tests."
+task :spec => %w[ test specs:run ]
 
