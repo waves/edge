@@ -14,6 +14,7 @@ module Waves
         @constraints = {}
 
         # These are essentially optional
+        maybe { @constraints[:requested] = Matchers::Requested.new options }
         maybe { @constraints[:accept] = Matchers::Accept.new options }
         maybe { @constraints[:ext]    = Matchers::Ext.new options[:ext] }
         maybe { @constraints[:query]  = Matchers::Query.new options[:query] }
