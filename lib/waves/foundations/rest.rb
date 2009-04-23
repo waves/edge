@@ -32,6 +32,15 @@ module Waves
         include ResponseMixin, Functor::Method
         extend  Resources::Mixin::ClassMethods
 
+        # Creatability definition block (POST)
+        #
+        # @see  .representation
+        #
+        def self.creatable(&block)
+          raise BadDefinition, "No .url_of_form specified!" unless @url
+          instance_eval &block
+        end
+
         # Representation definition block
         #
         def self.representation(*types, &block)
@@ -51,7 +60,7 @@ module Waves
           @url = Array(args)
         end
 
-        # Viewability definition block
+        # Viewability definition block (GET)
         #
         # @see  .representation
         #
