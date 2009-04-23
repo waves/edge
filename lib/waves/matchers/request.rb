@@ -7,17 +7,20 @@ module Waves
 
       # Create the top nested set of matchers.
       #
+      # @todo Further optimise the cases where there are no
+      #       constraints. --rue
+      #
       def initialize(options)
         # Simplest to fake it if there is no URL to match
         @uri = Matchers::URI.new(options) rescue lambda { {} }
 
         @constraints = {}
 
-        # These are essentially optional
+        # Any of these may or may not be present
         maybe { @constraints[:requested] = Matchers::Requested.new options }
         maybe { @constraints[:accept] = Matchers::Accept.new options }
-        maybe { @constraints[:ext]    = Matchers::Ext.new options[:ext] }
-        maybe { @constraints[:query]  = Matchers::Query.new options[:query] }
+        maybe { @constraints[:ext] = Matchers::Ext.new options[:ext] }
+        maybe { @constraints[:query] = Matchers::Query.new options[:query] }
         maybe { @constraints[:traits] = Matchers::Traits.new options[:traits] }
       end
 
