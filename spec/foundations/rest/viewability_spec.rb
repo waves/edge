@@ -79,9 +79,8 @@ describe "A representation definition" do
     }.should_not raise_error
   end
 
-  it "defines a matcher for the specified type" do
-    # @todo This is somewhat unscientific. --rue
-    mock(Waves::Matchers::Request).new(hash_including(:request => %w[text/javascript]))
+  it "defines a matcher" do
+    mock(Waves::Matchers::Request).new(anything)
 
     resource :ViewSpec do
       url_of_form :hi
@@ -91,5 +90,27 @@ describe "A representation definition" do
       }
     end
   end
+end
 
+describe "Matcher created by a viewable definition" do
+  before :all do
+    Object.send :remove_const, :ViewSpec if Object.const_defined?(:ViewSpec)
+  end
+
+  after :each do
+    Object.send :remove_const, :ViewSpec if Object.const_defined?(:ViewSpec)
+  end
+
+  it "looks for the given requested type(s)" do
+    # @todo This is somewhat unscientific. --rue
+    mock(Waves::Matchers::Request).new(hash_including(:requested => %w[text/javascript]))
+
+    resource :ViewSpec do
+      url_of_form :hi
+
+      viewable {
+        representation("text/javascript") {}
+      }
+    end
+  end
 end
