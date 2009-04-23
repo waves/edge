@@ -40,6 +40,10 @@ describe "A resource definition" do
     lambda {
       resource(:DefSpec) { viewable {} }
     }.should raise_error
+
+    lambda {
+      resource(:DefSpec) { creatable {} }
+    }.should raise_error
   end
 
 end
