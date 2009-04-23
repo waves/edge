@@ -16,6 +16,8 @@ describe "Viewability definition for a resource" do
   it "is available through the method #viewable in a resource definition" do
     lambda {
       resource :ViewSpec do
+        url_of_form :hi
+
         viewable {}
       end
     }.should_not raise_error
@@ -34,6 +36,8 @@ describe "The set of representations supported by a resource" do
   it "is defined through the #representation method inside a #viewable block" do
     lambda {
       resource :ViewSpec do
+        url_of_form :hi
+
         viewable {
           representation {}
         }
@@ -54,6 +58,8 @@ describe "A representation definition" do
   it "takes the MIME type the representation is for" do
     lambda {
       resource :ViewSpec do
+        url_of_form :hi
+
         viewable {
           representation("text/html") {}
         }
@@ -64,6 +70,8 @@ describe "A representation definition" do
   it "allows more than one MIME type to be specified" do
     lambda {
       resource :ViewSpec do
+        url_of_form :hi
+
         viewable {
           representation("text/html", "application/xml+xhtml") {}
         }
@@ -76,6 +84,8 @@ describe "A representation definition" do
     mock(Waves::Matchers::Request).new(hash_including(:accept => %w[text/javascript]))
 
     resource :ViewSpec do
+      url_of_form :hi
+
       viewable {
         representation("text/javascript") {}
       }
