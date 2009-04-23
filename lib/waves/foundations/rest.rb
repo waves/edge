@@ -17,19 +17,31 @@ module Waves
         include ResponseMixin, Functor::Method
         extend  Resources::Mixin::ClassMethods
 
+        # Representation definition block
+        #
+        def self.representation(*types, &block)
+          # @todo Faking it.
+          on(:get, true, :accept => types) {}
+        end
+
+        # URL format specification.
+        #
+        # The resource defines its own parts, but the app
+        # may provide a prefix or even completely override
+        # its selection (so long as it can provide all the
+        # named captures the resource is expecting, which
+        # means that type of override is rare in practice.
+        #
+        def self.url_of_form(*args)
+          @url = Array(args)
+        end
+
         # Viewability definition block
         #
         # @see  .representation
         #
         def self.viewable(&block)
           instance_eval &block
-        end
-
-        # Representation definition block
-        #
-        def self.representation(*types, &block)
-          # @todo Faking it.
-          on(:get, true, :accept => types) {}
         end
       end
 
