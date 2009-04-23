@@ -81,7 +81,7 @@ describe "A representation definition" do
 
   it "defines a matcher for the specified type" do
     # @todo This is somewhat unscientific. --rue
-    mock(Waves::Matchers::Request).new(hash_including(:accept => %w[text/javascript]))
+    mock(Waves::Matchers::Request).new(hash_including(:request => %w[text/javascript]))
 
     resource :ViewSpec do
       url_of_form :hi
