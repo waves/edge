@@ -40,7 +40,7 @@ module Waves
         # @see  .representation
         #
         def self.creatable(&block)
-          raise BadDefinition, "No .url_of_form specified!" unless @url_format
+          raise BadDefinition, "No .url_of_form specified!" unless @pathspec
 
           @method = :post
           instance_eval &block
@@ -52,7 +52,7 @@ module Waves
         #
         def self.representation(*types, &block)
           # @todo Faking it.
-          on(@method, @url_format, :requested => types) {}
+          on(@method, @pathspec, :requested => types) {}
         end
 
         # URL format specification.
@@ -64,7 +64,7 @@ module Waves
         # means that type of override is rare in practice.
         #
         def self.url_of_form(spec)
-          @url_format = Application.make_url_for self, spec
+          @pathspec = Application.make_url_for self, spec
         end
 
         # Viewability definition block (GET)
@@ -72,7 +72,7 @@ module Waves
         # @see  .representation
         #
         def self.viewable(&block)
-          raise BadDefinition, "No .url_of_form specified!" unless @url_format
+          raise BadDefinition, "No .url_of_form specified!" unless @pathspec
 
           @method = :get
           instance_eval &block
