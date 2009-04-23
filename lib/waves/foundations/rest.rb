@@ -5,6 +5,11 @@ module Waves
 
     module REST
 
+      # Some kind of a malformed resource definition
+      #
+      class BadDefinition < ::Exception; end
+
+
       # Base class to use for resources.
       #
       # Mainly here for simple access to some convenience
@@ -41,6 +46,7 @@ module Waves
         # @see  .representation
         #
         def self.viewable(&block)
+          raise BadDefinition, "No .url_of_form specified!" unless @url
           instance_eval &block
         end
       end
