@@ -25,6 +25,9 @@ module Waves
       # Mainly here for simple access to some convenience
       # methods.
       #
+      # @todo Should maybe insulate the term -> HTTP method
+      #       mapping a bit more. --rue
+      #
       class Resource
         # @todo Direct include/extend to avoid having to use
         #       Mixin. It is cumbersome to glue in at this
@@ -38,14 +41,18 @@ module Waves
         #
         def self.creatable(&block)
           raise BadDefinition, "No .url_of_form specified!" unless @url
+
+          @method = :post
           instance_eval &block
+        ensure
+          @method = nil
         end
 
         # Representation definition block
         #
         def self.representation(*types, &block)
           # @todo Faking it.
-          on(:get, true, :requested => types) {}
+          on(@method, true, :requested => types) {}
         end
 
         # URL format specification.
@@ -66,7 +73,11 @@ module Waves
         #
         def self.viewable(&block)
           raise BadDefinition, "No .url_of_form specified!" unless @url
+
+          @method = :get
           instance_eval &block
+        ensure
+          @method = nil
         end
       end
 
