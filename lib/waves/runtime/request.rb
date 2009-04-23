@@ -111,7 +111,7 @@ module Waves
       #       lang and charset
       #
       def self.parse(str)
-        return [] if str.nil?
+        return self.new if str.nil?
 
         terms = str.scan /([^,][^;]*[^,]*)/
         terms.map! {|t| extract_term_and_value t.to_s }
@@ -160,7 +160,6 @@ module Waves
     #       of the Undefined type.
     #
     def requested()
-      return @accept if @accept
       if ext
         @accept = Accept[MimeTypes[ext]]
         return @accept

@@ -8,7 +8,7 @@ module Waves
       #
       def safe(request)
         # Safeish default
-        request.response.content_type = "text/html"
+        request.response.content_type =  Waves::MimeTypes[request.ext] || request.accept.default || "text/html"
 
         resource = Waves.config.resource.new request
 
