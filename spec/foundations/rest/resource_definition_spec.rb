@@ -24,4 +24,27 @@ describe "A resource definition" do
     Object.const_defined?(:DefSpec).should == true
     DefSpec.class.should == Class
   end
+
+  # @todo This is kind of annoying to have explicit but not
+  #       automatically present in the def. --rue
+  #
+  # @todo Maybe try to use #/ for defining the URLs for
+  #       extra fun.
+  it "requires the resource to define the form of its URL" do
+    lambda {
+      resource(:DefSpec) { url_of_form [{:path => 0..-1}, :name] }
+    }.should_not raise_error
+  end
+
+  it "raises an error when defining 'methods' if the URL form has not been defined" do
+    lambda {
+      resource(:DefSpec) { viewable {} }
+    }.should raise_error
+
+    lambda {
+      resource(:DefSpec) { creatable {} }
+    }.should raise_error
+  end
+
 end
+
