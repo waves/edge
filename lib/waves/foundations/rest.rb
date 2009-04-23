@@ -26,7 +26,7 @@ module Waves
         #
         def self.representation(*types, &block)
           # @todo Faking it.
-          on(:get, true, :accept => types) {}
+          on(:get, true, :requested => types) {}
         end
 
         # URL format specification.
