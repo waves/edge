@@ -10,6 +10,16 @@ module Waves
       class BadDefinition < ::Exception; end
 
 
+      # Applications are formal, rather than ad-hoc Waves apps.
+      #
+      class Application
+        # Construct and possibly override URL for a resource.
+        #
+        def self.make_url_for(resource, urlspec)
+          urlspec
+        end
+      end
+
       # Base class to use for resources.
       #
       # Mainly here for simple access to some convenience
