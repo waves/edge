@@ -38,7 +38,7 @@ describe "A resource definition" do
 
   it "raises an error when defining 'methods' if the URL form has not been defined" do
     lambda {
-      resource(:DefSpec) { viewable("text/html") {} }
+      resource(:DefSpec) { viewable {} }
     }.should raise_error
   end
 
