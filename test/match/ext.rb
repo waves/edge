@@ -133,7 +133,7 @@ describe "File extension matching in conjunction with Accept matching" do
   end
 
   feature "fails if the Accept match fails" do
-    m = Waves::Matchers::Request.new :accept => ["text/html"],
+    m = Waves::Matchers::Request.new :requested => ["text/html"],
                                      :ext => :js
 
     request = Waves::Request.new env("http://example.com/moo.js",
@@ -159,7 +159,7 @@ describe "File extension matching in conjunction with Accept matching" do
   end
 
   feature "causes Accept match to fail if there is a file extension, and absence is specified" do
-    m = Waves::Matchers::Request.new :accept => ["text/javascript"],
+    m = Waves::Matchers::Request.new :requested => ["text/javascript"],
                                      :ext => [""]
 
     request = Waves::Request.new env("http://example.com/moo.js",
@@ -169,16 +169,15 @@ describe "File extension matching in conjunction with Accept matching" do
     (!!m.call(request)).should == false
   end
 
-  feature "specifying extension is overridden by presence of Undefined in Accept" do
-      m = Waves::Matchers::Request.new :accept => [Waves::Mime::Undefined],
-                                         :ext => [:js]
+  feature "specifying extension is overridden by presence of Unspecified in Accept" do
+    m = Waves::Matchers::Request.new :requested => [Waves::Mime::Unspecified],
+                                     :ext => [:js]
 
-      request = Waves::Request.new env("http://example.com/moo.js",
+    request = Waves::Request.new env("http://example.com/moo.js",
                                      :method => "GET",
                                      "HTTP_ACCEPT" => "text/javascript")
 
-(!!m.call(request)).should == false
-
+    (!!m.call(request)).should == false
   end
 
 

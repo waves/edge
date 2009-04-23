@@ -22,14 +22,14 @@ module Waves
 
 
   module Mime
-    # Undefined MIME type.
+    # Unspecified MIME type.
     #
     # Primarily used to indicate the absence of a file
     # extension.
     #
     # @see  Request#accept
     #
-    Undefined = "application/vnd.com.rubywaves.undefined"
+    Unspecified = "application/vnd.com.rubywaves.undefined"
   end
 
   MIME_TYPES = {
