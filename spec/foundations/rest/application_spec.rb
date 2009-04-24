@@ -60,6 +60,7 @@ end
 
 describe "Composing resources in the Application definition" do
   after :each do
+    Waves.applications.clear
     REST::Application.send :remove_const, :DefSpecApp if REST::Application.const_defined?(:DefSpecApp)
   end
 
@@ -84,7 +85,7 @@ describe "Composing resources in the Application definition" do
       }
     }
 
-    REST::Application::DefSpecApp::Mounts.const_defined?(:Mounts).should == true
+    REST::Application::DefSpecApp.const_defined?(:Mounts).should == true
   end
 
 end
