@@ -1,5 +1,6 @@
 require "ostruct"
 
+require "waves/ext/string"
 require "waves/resources/mixin"
 
 module Waves
@@ -28,6 +29,7 @@ module Waves
         #
         def self.at(mountpoint, map)
           file, constant = *map.to_a.first
+          constant = constant.to_s.snake_case.to_sym
 
           @resources[constant] = OpenStruct.new :file => file,
                                                 :mountpoint => mountpoint
