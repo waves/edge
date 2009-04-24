@@ -100,5 +100,19 @@ describe "Composing resources in the Application definition" do
     REST::Application::DefSpecApp.const_defined?(:Mounts).should == true
   end
 
+  # @todo This needs a functional counterpart to actually verify the call. --rue
+  it "defines matchers for a composing resource using its mount point" do
+    mock(Waves::Resources::Base).on(true, ["foobar"])
+
+    application(:DefSpecApp) {
+      composed_of {
+        at ["foobar"], "pg" => :Page
+      }
+    }
+  end
+
+  it "defines matchers for all composing resources in order of appearance" do
+    fail
+  end
 end
 
