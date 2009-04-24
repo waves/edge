@@ -64,17 +64,29 @@ describe "Composing resources in the Application definition" do
     REST::Application.send :remove_const, :DefSpecApp if REST::Application.const_defined?(:DefSpecApp)
   end
 
-  it "uses the .at method to map mount points to filenames, aliased to a constant" do
+  it "uses the .at method to map mount points to filenames, aliased to a name" do
     application(:DefSpecApp) {
       composed_of {
-        at ["foobar"], "page" => :Page
+        at ["foobar"], "page" => :page
       }
     }
 
     resources = Waves.main.resources
     resources.size.should == 1
-    resources[:Page].file.should == "page"
-    resources[:Page].mountpoint.should == ["foobar"]
+    resources[:page].file.should == "page"
+    resources[:page].mountpoint.should == ["foobar"]
+  end
+
+  it "stores the name as a lowercase symbol" do
+    application(:DefSpecApp) {
+      composed_of {
+        at ["foobar2"], "page2" => :Page
+      }
+    }
+
+    resources = Waves.main.resources
+    resources[:page].file.should == "page2"
+    resources[:page].mountpoint.should == ["foobar2"]
   end
 
   # @todo I am a bit iffy about the concept of a "main resource". --rue
