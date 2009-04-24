@@ -113,7 +113,7 @@ module Waves
         # Resource definition block.
         #
         def resource(name, &block)
-          Object.const_set name, Class.new(REST::Resource, &block)
+          Object.const_set name, Class.new(Resource, &block)
         end
 
       end
