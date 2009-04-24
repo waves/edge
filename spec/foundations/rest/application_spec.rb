@@ -112,7 +112,23 @@ describe "Composing resources in the Application definition" do
   end
 
   it "defines matchers for all composing resources in order of appearance" do
-    fail
+    mock(Waves::Resources::Base) do |base|
+      base.on true, ["foobar"]
+      base.on true, [true]
+      base.on true, ["meebies"]
+      base.on true, []
+      base.on true, ["ugga"]
+    end
+
+    application(:DefSpecApp) {
+      composed_of {
+        at ["foobar"], "pg" => :Page
+        at [true], "me" => :whatever
+        at ["meebies"], "bleh" => "yay"
+        at [], "weird" => :evenStranger
+        at ["ugga"], "meh/beh" => :Alt
+      }
+    }
   end
 end
 
