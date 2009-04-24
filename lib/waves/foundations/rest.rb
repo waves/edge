@@ -7,7 +7,7 @@ module Waves
 
       # Some kind of a malformed resource definition
       #
-      class BadDefinition < ::Exception; end
+      class BadDefinition < StandardError; end
 
 
       # Applications are formal, rather than ad-hoc Waves apps.
