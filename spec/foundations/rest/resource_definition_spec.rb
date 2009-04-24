@@ -14,6 +14,7 @@ describe "A resource definition" do
   end
 
   after :all do
+    Waves.applications.clear
     REST::Application.send :remove_const, :DefApp
   end
 
@@ -33,7 +34,7 @@ describe "A resource definition" do
     resource(:DefSpec) {}
 
     REST::Application::DefApp.const_defined?(:DefSpec).should == true
-    DefSpec.class.should == Class
+    REST::Application::DefApp::DefSpec.class.should == Class
   end
 
   # @todo This is kind of annoying to have explicit but not
