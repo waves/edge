@@ -8,7 +8,7 @@ include Waves::Foundations
 describe "Defining an Application" do
 
   after :each do
-    REST::Application.send :remove_const, :MyApp if REST::Application.const_defined?(:MyApp)
+    REST::Application.send :remove_const, :DefSpecApp if REST::Application.const_defined?(:DefSpecApp)
   end
 
   # @todo Much fleshing out here. Overrides and such. --rue
@@ -19,14 +19,14 @@ describe "Defining an Application" do
     }.should raise_error
 
     lambda {
-      application(:MyApp) {}
+      application(:DefSpecApp) {}
     }.should_not raise_error
   end
 
   it "is created as named constant under REST::Application" do
-    REST::Application.const_defined?(:MyApp).should == false
-    application(:MyApp) {}
-    REST::Application.const_defined?(:MyApp).should == true
+    REST::Application.const_defined?(:DefSpecApp).should == false
+    application(:DefSpecApp) {}
+    REST::Application.const_defined?(:DefSpecApp).should == true
   end
 
   it "gives some full URL form when supplied a resource and its specifics" do
@@ -36,8 +36,26 @@ describe "Defining an Application" do
     ret.should include(:whatever)
   end
 
+  it "provides a block to define the composition of resources" do
+    lambda {
+      application(:DefSpecApp) {
+        composed_of {}
+      }
+    }.should_not raise_error
+  end
+
+  it "raises an error unless some resource composition is done" do
+    fail
+  end
 end
 
+
+describe "Composing resources in the Application definition" do
+  after :each do
+    REST::Application.send :remove_const, :DefSpecApp if REST::Application.const_defined?(:DefSpecApp)
+  end
+
+end
 
 describe "Currently active Application" do
   before :all do
