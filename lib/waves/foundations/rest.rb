@@ -49,6 +49,10 @@ module Waves
           instance_eval &block
 
           mounts = const_set :Mounts, Class.new(Waves::Resources::Base)
+
+          @resources.each {|name, info|
+            mounts.on(true, info.mountpoint) { to name }
+          }
         end
 
         # Construct and possibly override URL for a resource.
