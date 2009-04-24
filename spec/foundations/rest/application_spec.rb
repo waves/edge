@@ -14,19 +14,11 @@ describe "Defining an Application" do
 
   # @todo Much fleshing out here. Overrides and such. --rue
 
-  it "requires a name" do
-    lambda {
-      application {}
-    }.should raise_error
-
-    lambda {
-      application(:DefSpecApp) {}
-    }.should_not raise_error
-  end
-
-  it "is created as named constant under REST::Application" do
+  it "is created as named constant under REST::Application using given name" do
     REST::Application.const_defined?(:DefSpecApp).should == false
-    application(:DefSpecApp) {}
+    application(:DefSpecApp) {
+      composed_of { at [true], "hi" => :Hi }
+    }
     REST::Application.const_defined?(:DefSpecApp).should == true
   end
 
@@ -37,23 +29,27 @@ describe "Defining an Application" do
     ret.should include(:whatever)
   end
 
-  it "provides a block to define the composition of resources" do
+  it "raises an error unless some resource composition is done" do
+    lambda {
+      application(:DefSpecApp) {
+      }
+    }.should raise_error
+
     lambda {
       application(:DefSpecApp) {
         composed_of {}
       }
-    }.should_not raise_error
-  end
-
-  it "raises an error unless some resource composition is done" do
-    fail
+    }.should raise_error
   end
 
   it "adds the Application to the application list" do
     Waves.applications.should be_empty
 
     myapp = nil
-    application(:DefSpecApp) { myapp = self }
+    application(:DefSpecApp) {
+      myapp = self
+      composed_of { at [true], "hi" => :Hi }
+    }
 
     Waves.applications.size.should == 1
     Waves.main.should == myapp
