@@ -3,6 +3,7 @@ module Waves
   # A temporary measure until the applications "array" becomes a hash.
   # Currently used to keep track of all loaded Waves applications.
   class Applications < Array
+    # @todo Yeah, uh, this does not work this way. --rue
     def []( name ) ; self.find { |app| app == name.to_s.camel_case } ; end
   end
 

@@ -5,9 +5,7 @@ require "waves/foundations/rest"
 
 describe "A resource definition" do
   before :all do
-    application :DefApp do
-      # ...
-    end
+    application(:DefApp) {}
   end
 
   after :all do
@@ -15,7 +13,9 @@ describe "A resource definition" do
   end
 
   after :each do
-    DefApp.send :remove_const, :DefSpec if Object.const_defined?(:DefSpec)
+    if REST::Application::DefApp.const_defined?(:DefSpec)
+      REST::Application::DefApp.send :remove_const, :DefSpec
+    end
   end
 
   it "takes a single Symbol argument for the resource name" do
