@@ -5,7 +5,7 @@ require "waves/foundations/rest"
 
 include Waves::Foundations
 
-describe "The Application" do
+describe "Defining an Application" do
 
   after :each do
     REST::Application.send :remove_const, :MyApp if REST::Application.const_defined?(:MyApp)
@@ -37,6 +37,7 @@ describe "The Application" do
   end
 
 end
+
 
 describe "Currently active Application" do
   before :all do

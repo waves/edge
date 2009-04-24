@@ -13,6 +13,14 @@ module Waves
       # Applications are formal, rather than ad-hoc Waves apps.
       #
       class Application
+
+        # Define an Application using block.
+        #
+        def initialize(name)
+          @name = name
+          yield
+        end
+
         # Construct and possibly override URL for a resource.
         #
         def self.make_url_for(resource, urlspec)
@@ -84,6 +92,17 @@ module Waves
       # Discrete set of methods to include globally.
       #
       module ConvenienceMethods
+
+        # Application definition block.
+        #
+        # Name may be optionally provided but is not used.
+        #
+        # @todo Look into using name. --rue
+        #
+        def application(name, &block)
+          app = Class.new Application, &block
+          Application.const_set name, app
+        end
 
         # Resource definition block.
         #
