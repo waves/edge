@@ -8,6 +8,7 @@ include Waves::Foundations
 describe "Defining an Application" do
 
   after :each do
+    Waves.applications.clear
     REST::Application.send :remove_const, :DefSpecApp if REST::Application.const_defined?(:DefSpecApp)
   end
 
@@ -46,6 +47,17 @@ describe "Defining an Application" do
 
   it "raises an error unless some resource composition is done" do
     fail
+  end
+
+  it "adds the Application to the application list" do
+    Waves.applications.should be_empty
+
+    myapp = nil
+    application(:DefSpecApp) { myapp = self }
+
+    Waves.applications.size.should == 1
+    Waves.main.should == myapp
+    Waves.main.name.split(/::/).last.should == "DefSpecApp"
   end
 end
 
