@@ -78,14 +78,6 @@ describe "Composing resources in the Application definition" do
 end
 
 describe "Currently active Application" do
-  before :all do
-    Object.send :remove_const, :DefSpec if Object.const_defined?(:DefSpec)
-  end
-
-  after :each do
-    Object.send :remove_const, :DefSpec if Object.const_defined?(:DefSpec)
-  end
-
   it "is not defined outside of an application definition block" do
     fail
   end

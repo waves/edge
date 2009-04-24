@@ -2,14 +2,19 @@ require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "spec_hel
 
 # Our stuff
 require "waves/foundations/rest"
+include Waves::Foundations
 
 describe "A resource definition" do
   before :all do
-    application(:DefApp) {}
+    application(:DefApp) {
+      composed_of {
+        at ["defspec"], "somefile" => :DefSpec
+      }
+    }
   end
 
   after :all do
-    Object.send :remove_const, :DefApp
+    REST::Application.send :remove_const, :DefApp
   end
 
   after :each do
@@ -23,11 +28,11 @@ describe "A resource definition" do
   end
 
   it "defines a class using the given name" do
-    Object.const_defined?(:DefSpec).should == false
+    REST::Application::DefApp.const_defined?(:DefSpec).should == false
 
     resource(:DefSpec) {}
 
-    Object.const_defined?(:DefSpec).should == true
+    REST::Application::DefApp.const_defined?(:DefSpec).should == true
     DefSpec.class.should == Class
   end
 
