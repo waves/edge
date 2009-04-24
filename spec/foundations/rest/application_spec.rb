@@ -22,13 +22,6 @@ describe "Defining an Application" do
     REST::Application.const_defined?(:DefSpecApp).should == true
   end
 
-  it "gives some full URL form when supplied a resource and its specifics" do
-    res = Class.new(REST::Resource) {}
-
-    ret = REST::Application.make_url_for res, [:whatever]
-    ret.should include(:whatever)
-  end
-
   it "raises an error unless some resource composition is done" do
     lambda {
       application(:DefSpecApp) {

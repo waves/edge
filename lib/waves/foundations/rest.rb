@@ -95,14 +95,6 @@ module Waves
           @method = nil
         end
 
-        # Pathspec this resource needs for processing.
-        #
-        # @see  .url_of_form()
-        #
-        def self.needs_from_url()
-          @pathspec
-        end
-
         # Representation definition block
         #
         def self.representation(*types, &block)
