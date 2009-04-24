@@ -14,11 +14,17 @@ module Waves
       #
       class Application
 
-        # Define an Application using block.
+        # Resource composition block.
         #
-        def initialize(name)
-          @name = name
-          yield
+        # In this block, the Application defines all of the
+        # resources it is composed of (and their prefixes or
+        # "mountpoints.") The resources themselves are not
+        # defined here.
+        #
+        # @see  .at()
+        #
+        def self.composed_of(&block)
+          instance_eval &block
         end
 
         # Construct and possibly override URL for a resource.
