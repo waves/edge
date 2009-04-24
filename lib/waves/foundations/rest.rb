@@ -1,3 +1,5 @@
+require "ostruct"
+
 require "waves/resources/mixin"
 
 module Waves
@@ -14,6 +16,23 @@ module Waves
       #
       class Application
 
+        class << self
+
+          # Resources this application is composed of.
+          #
+          attr_reader :resources
+
+        end
+
+        # Associate mountpoint with a file and a constant.
+        #
+        def self.at(mountpoint, map)
+          file, constant = *map.to_a.first
+
+          @resources[constant] = OpenStruct.new :file => file,
+                                                :mountpoint => mountpoint
+        end
+
         # Resource composition block.
         #
         # In this block, the Application defines all of the
@@ -24,6 +43,8 @@ module Waves
         # @see  .at()
         #
         def self.composed_of(&block)
+          @resources ||= {}
+
           instance_eval &block
         end
 
