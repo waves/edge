@@ -111,14 +111,20 @@ describe "Composing resources in the Application definition" do
     }
   end
 
+  # @todo Do we need to assert the negative here too? --rue
   it "defines matchers for all composing resources in order of appearance" do
-    mock(Waves::Resources::Base) do |base|
-      base.on true, ["foobar"]
-      base.on true, [true]
-      base.on true, ["meebies"]
-      base.on true, []
-      base.on true, ["ugga"]
-    end
+    sequence = [["foobar"],
+                [true],
+                ["meebies"],
+                [],
+                ["ugga"]
+               ]
+
+    mock(Waves::Resources::Base).on(true,
+                                    satisfy {|path|
+                                      path == sequence.shift
+                                    }
+                                   ).times(sequence.size)
 
     application(:DefSpecApp) {
       composed_of {
