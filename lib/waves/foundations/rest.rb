@@ -31,8 +31,7 @@ module Waves
           file, constant = *map.to_a.first
           constant = constant.to_s.snake_case.to_sym
 
-          @resources[constant] = OpenStruct.new :file => file,
-                                                :mountpoint => mountpoint
+          @composition << [constant, OpenStruct.new(:file => file, :mountpoint => mountpoint)]
         end
 
         # Resource composition block.
@@ -42,15 +41,21 @@ module Waves
         # "mountpoints.") The resources themselves are not
         # defined here.
         #
+        # The order of composition is stored and used.
+        #
         # @see  .at()
         #
         def self.composed_of(&block)
-          @resources ||= {}
+          @composition ||= []
           instance_eval &block
 
           mounts = const_set :Mounts, Class.new(Waves::Resources::Base)
 
-          @resources.each {|name, info|
+          # Only construct the Hash here to retain order for .on()s
+          @resources ||= {}
+
+          @composition.each {|name, info|
+            @resources[name] = info
             mounts.on(true, info.mountpoint) { to name }
           }
         end
