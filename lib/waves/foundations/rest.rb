@@ -46,8 +46,9 @@ module Waves
         #
         def self.composed_of(&block)
           @resources ||= {}
-
           instance_eval &block
+
+          mounts = const_set :Mounts, Class.new(Waves::Resources::Base)
         end
 
         # Construct and possibly override URL for a resource.
