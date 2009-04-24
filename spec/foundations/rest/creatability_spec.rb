@@ -31,7 +31,7 @@ describe "Createability definition for a resource" do
   it "is available through the method #viewable in a resource definition" do
     lambda {
       resource :ResourceCreateSpec do
-        url_of_form :hi
+        url_of_form [:hi]
 
         creatable {}
       end
@@ -84,11 +84,7 @@ describe "Matcher created by a viewable definition" do
   end
 
   it "is defined for the path constructed by .url_of_form" do
-    pathspec = ["prefeex", {:path => 0..-1}, :name]
-
-    mock(REST::Application).make_url_for(anything, [{:path => 0..-1}, :name]) {
-      pathspec
-    }
+    pathspec = ["createspec", {:path => 0..-1}, :name]
 
     mock(REST::Resource).on(:post, pathspec, anything)
 

@@ -28,8 +28,8 @@ describe "Viewability definition for a resource" do
 
   it "is available through the method #viewable in a resource definition" do
     lambda {
-      resource :ViewSpec do
-        url_of_form :hi
+      resource :ResourceViewSpec do
+        url_of_form [:hi]
 
         viewable {}
       end
@@ -60,7 +60,7 @@ describe "The set of representations supported by a resource" do
   it "is defined through the #representation method inside a #viewable block" do
     lambda {
       resource :ResourceViewSpec do
-        url_of_form :hi
+        url_of_form [:hi]
 
         viewable {
           representation {}
@@ -93,7 +93,7 @@ describe "A representation definition" do
   it "takes the MIME type the representation is for" do
     lambda {
       resource :ResourceViewSpec do
-        url_of_form :hi
+        url_of_form [:hi]
 
         viewable {
           representation("text/html") {}
@@ -105,7 +105,7 @@ describe "A representation definition" do
   it "allows more than one MIME type to be specified" do
     lambda {
       resource :ResourceViewSpec do
-        url_of_form :hi
+        url_of_form [:hi]
 
         viewable {
           representation("text/html", "application/xml+xhtml") {}
@@ -118,7 +118,7 @@ describe "A representation definition" do
     mock(Waves::Matchers::Request).new(anything)
 
     resource :ResourceViewSpec do
-      url_of_form :hi
+      url_of_form [:hi]
 
       viewable {
         representation("text/javascript") {}
@@ -132,7 +132,7 @@ describe "Matcher created by a viewable definition" do
   before :all do
     application(:ResourceViewApp) {
       composed_of {
-        at ["createspec"], "somefile" => :ResourceViewSpec
+        at ["viewspec"], "somefile" => :ResourceViewSpec
       }
     }
   end
@@ -173,11 +173,7 @@ describe "Matcher created by a viewable definition" do
   end
 
   it "is defined for the path constructed by .url_of_form" do
-    pathspec = ["prefeex", {:path => 0..-1}, :name]
-
-    mock(REST::Application).make_url_for(anything, [{:path => 0..-1}, :name]) {
-      pathspec
-    }
+    pathspec = ["viewspec", {:path => 0..-1}, :name]
 
     mock(REST::Resource).on(:get, pathspec, anything)
 

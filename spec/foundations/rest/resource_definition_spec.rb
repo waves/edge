@@ -52,10 +52,6 @@ describe "A resource definition" do
     lambda {
       resource(:DefSpec) { viewable {} }
     }.should raise_error(REST::BadDefinition)
-
-    lambda {
-      resource(:DefSpec) { creatable {} }
-    }.should raise_error(REST::BadDefinition)
   end
 
 end
