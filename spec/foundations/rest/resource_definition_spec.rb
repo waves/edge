@@ -47,15 +47,18 @@ describe "A resource definition" do
       resource(:DefSpec) { url_of_form [{:path => 0..-1}, :name] }
     }.should_not raise_error
   end
+#
+#  it "" do
+#  end
 
   it "raises an error when defining 'methods' if the URL form has not been defined" do
     lambda {
       resource(:DefSpec) { viewable {} }
-    }.should raise_error
+    }.should raise_error(REST::BadDefinition)
 
     lambda {
       resource(:DefSpec) { creatable {} }
-    }.should raise_error
+    }.should raise_error(REST::BadDefinition)
   end
 
 end

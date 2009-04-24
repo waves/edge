@@ -33,13 +33,13 @@ describe "Defining an Application" do
     lambda {
       application(:DefSpecApp) {
       }
-    }.should raise_error
+    }.should raise_error(REST::BadDefinition)
 
     lambda {
       application(:DefSpecApp) {
         composed_of {}
       }
-    }.should raise_error
+    }.should raise_error(REST::BadDefinition)
   end
 
   it "adds the Application to the application list" do
