@@ -47,9 +47,11 @@ describe "A resource definition" do
       resource(:DefSpec) { url_of_form [{:path => 0..-1}, :name] }
     }.should_not raise_error
   end
-#
-#  it "" do
-#  end
+
+  it "enables accessing the URL form using .needs_from_url" do
+    resource(:DefSpec) { url_of_form [{:path => true}, :name]}
+    Waves.main::DefSpec.needs_from_url == [{:path => true}, :name]
+  end
 
   it "raises an error when defining 'methods' if the URL form has not been defined" do
     lambda {
