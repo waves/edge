@@ -75,14 +75,17 @@ describe "Composing resources in the Application definition" do
     resources[:Page].file.should == "page"
     resources[:Page].mountpoint.should == ["foobar"]
   end
-end
 
-describe "Currently active Application" do
-  it "is not defined outside of an application definition block" do
-    fail
+  # @todo I am a bit iffy about the concept of a "main resource". --rue
+  it "defines a Mounts resource as the root" do
+    application(:DefSpecApp) {
+      composed_of {
+        at ["foobar"], "page" => :Page
+      }
+    }
+
+    REST::Application::DefSpecApp::Mounts.const_defined?(:Mounts).should == true
   end
 
-  it "is the application whose definition we are in" do
-    fail
-  end
 end
+
