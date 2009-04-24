@@ -135,8 +135,10 @@ module Waves
 
         # Resource definition block.
         #
+        # @todo Must change the Waves.main to *current* app.
+        #
         def resource(name, &block)
-          Object.const_set name, Class.new(Resource, &block)
+          Waves.main.const_set name, Class.new(Resource, &block)
         end
 
       end
