@@ -101,13 +101,11 @@ module Waves
 
         # Application definition block.
         #
-        # Name may be optionally provided but is not used.
-        #
-        # @todo Look into using name. --rue
-        #
         def application(name, &block)
           app = Class.new Application, &block
           Application.const_set name, app
+
+          Waves << app
         end
 
         # Resource definition block.
