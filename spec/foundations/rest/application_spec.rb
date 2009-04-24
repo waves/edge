@@ -67,6 +67,18 @@ describe "Composing resources in the Application definition" do
     REST::Application.send :remove_const, :DefSpecApp if REST::Application.const_defined?(:DefSpecApp)
   end
 
+  it "uses the .at method to map mount points to filenames, aliased to a constant" do
+    application(:DefSpecApp) {
+      composed_of {
+        at ["foobar"], "page" => :Page
+      }
+    }
+
+    resources = Waves.main.resources
+    resources.size.should == 1
+    resources[:Page].file.should == "page"
+    resources[:Page].mountpoint.should == ["foobar"]
+  end
 end
 
 describe "Currently active Application" do
