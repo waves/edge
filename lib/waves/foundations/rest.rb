@@ -62,8 +62,11 @@ module Waves
 
         # Construct and possibly override URL for a resource.
         #
-        def self.make_url_for(resource, urlspec)
-          urlspec
+        # @todo Support overrides here. --rue
+        #
+        def self.url_for(resource, pathspec)
+          info = Waves.main.resources[resource.name.split(/::/).last.snake_case.to_sym]
+          info.mountpoint + pathspec
         end
       end
 
@@ -111,7 +114,7 @@ module Waves
         # means that type of override is rare in practice.
         #
         def self.url_of_form(spec)
-          @pathspec = Application.make_url_for self, spec
+          @pathspec = Application.url_for self, spec
         end
 
         # Viewability definition block (GET)
@@ -150,7 +153,11 @@ module Waves
         # @todo Must change the Waves.main to *current* app.
         #
         def resource(name, &block)
-          Waves.main.const_set name, Class.new(Resource, &block)
+          # We must eval this, because the constant really needs
+          # to be defined at the point we are running the body
+          # code. --rue
+          res = Waves.main.const_set name, Class.new(Resource)
+          res.instance_eval &block
         end
 
       end
