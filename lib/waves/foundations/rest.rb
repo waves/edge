@@ -124,8 +124,12 @@ module Waves
         #
         def application(name, &block)
           app = Class.new Application, &block
-          Application.const_set name, app
 
+          if app.resources.nil? or app.resources.empty?
+            raise BadDefinition, "No resource composition!"
+          end
+
+          Application.const_set name, app
           Waves << app
         end
 
