@@ -131,3 +131,29 @@ describe "Composing resources in the Application definition" do
   end
 end
 
+describe "An Application supporting a resource" do
+  before :each do
+    application(:DefSpecApp) {
+      composed_of {
+        at ["foobar", :something], "pg" => :DefSpecRes
+      }
+    }
+  end
+
+  after :each do
+    Waves.applications.clear
+    REST::Application.send :remove_const, :DefSpecApp if REST::Application.const_defined?(:DefSpecApp)
+  end
+
+  it "provides it a full pathspec given the resource-specific part using .url_for" do
+    resource(:DefSpecRes) {
+      url_of_form [{:path => 0..-1}, :name]
+      viewable { representation("text/html") {} }
+    }
+
+    pathspec = Waves.main.url_for(Waves.main::DefSpecRes, [{:path => 0..-1}, :name])
+    pathspec.should == ["foobar", :something, {:path => 0..-1}, :name]
+  end
+
+end
+
