@@ -27,7 +27,7 @@ describe "A resource definition" do
     lambda { resource(:DefSpec) {} }.should_not raise_error
   end
 
-  it "defines a class using the given name" do
+  it "defines a class using the given name under the active App" do
     REST::Application::DefApp.const_defined?(:DefSpec).should == false
 
     resource(:DefSpec) {}
