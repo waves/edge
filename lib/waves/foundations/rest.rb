@@ -99,9 +99,9 @@ module Waves
         #
         # @todo This may be obsolete, move to registration? --rue
         #
-        def self.url_for(resource, pathspec)
-          info = Waves.main.resources[resource.name.split(/::/).last.snake_case.to_sym]
-          info.mountpoint + pathspec
+        def self.url_for(resource)
+          info = Waves.main.resources[resource.defined_in]
+          info.mountpoint + resource.needed_from_url
         end
       end
 
