@@ -4,6 +4,8 @@ require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "spec_hel
 require "waves/foundations/rest"
 include Waves::Foundations
 
+fail "Need to spec #defined_in and #needed_from_URL"
+
 describe "A resource definition" do
   before :all do
     application(:DefApp) {
