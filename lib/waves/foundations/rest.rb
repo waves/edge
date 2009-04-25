@@ -153,10 +153,12 @@ module Waves
         # @todo Must change the Waves.main to *current* app.
         #
         def resource(name, &block)
+          mod = if Module === self then self else Object end
+
           # We must eval this, because the constant really needs
           # to be defined at the point we are running the body
           # code. --rue
-          res = Waves.main.const_set name, Class.new(Resource)
+          res = mod.const_set name, Class.new(Resource)
           res.instance_eval &block
         end
 
