@@ -28,13 +28,24 @@ describe "A resource definition" do
     lambda { resource(:DefSpec) {} }.should_not raise_error
   end
 
-  it "defines a class using the given name under the active App" do
-    REST::Application::DefApp.const_defined?(:DefSpec).should == false
+  it "defines a class with given name as constant under its nesting" do
+    ResDefModule.const_defined?(:DefSpec).should == false
+
+    module ResDefModule
+      resource(:DefSpec) {}
+    end
+
+    ResDefModule.const_defined?(:DefSpec).should == true
+    ResDefModule::DefSpec.class.should == Class
+  end
+
+  it "defines a class with given name as constant if not nested" do
+    Object.const_defined?(:DefSpec).should == false
 
     resource(:DefSpec) {}
 
-    REST::Application::DefApp.const_defined?(:DefSpec).should == true
-    REST::Application::DefApp::DefSpec.class.should == Class
+    Object.const_defined?(:DefSpec).should == true
+    DefSpec.class.should == Class
   end
 
   # @todo This is kind of annoying to have explicit but not
