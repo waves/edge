@@ -144,7 +144,9 @@ module Waves
             raise BadDefinition, "No resource composition!"
           end
 
-          Application.const_set name, app
+          mod = if Module === self then self else Object end
+          mod.const_set name, app
+
           Waves << app
         end
 
