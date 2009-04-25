@@ -17,13 +17,11 @@ describe "Viewability definition for a resource" do
 
   after :all do
     Waves.applications.clear
-    REST::Application.send :remove_const, :ResourceViewApp
+    Object.send :remove_const, :ResourceViewApp
   end
 
   after :each do
-    if REST::Application::ResourceViewApp.const_defined?(:ResourceViewSpec)
-      REST::Application::ResourceViewApp.send :remove_const, :ResourceViewSpec
-    end
+    Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
   end
 
   it "is available through the method #viewable in a resource definition" do
@@ -48,13 +46,11 @@ describe "The set of representations supported by a resource" do
 
   after :all do
     Waves.applications.clear
-    REST::Application.send :remove_const, :ResourceViewApp
+    Object.send :remove_const, :ResourceViewApp
   end
 
   after :each do
-    if REST::Application::ResourceViewApp.const_defined?(:ResourceViewSpec)
-      REST::Application::ResourceViewApp.send :remove_const, :ResourceViewSpec
-    end
+    Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
   end
 
   it "is defined through the #representation method inside a #viewable block" do
@@ -81,13 +77,11 @@ describe "A representation definition" do
 
   after :all do
     Waves.applications.clear
-    REST::Application.send :remove_const, :ResourceViewApp
+    Object.send :remove_const, :ResourceViewApp
   end
 
   after :each do
-    if REST::Application::ResourceViewApp.const_defined?(:ResourceViewSpec)
-      REST::Application::ResourceViewApp.send :remove_const, :ResourceViewSpec
-    end
+    Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
   end
 
   it "takes the MIME type the representation is for" do
@@ -139,13 +133,11 @@ describe "Matcher created by a viewable definition" do
 
   after :all do
     Waves.applications.clear
-    REST::Application.send :remove_const, :ResourceViewApp
+    Object.send :remove_const, :ResourceViewApp
   end
 
   after :each do
-    if REST::Application::ResourceViewApp.const_defined?(:ResourceViewSpec)
-      REST::Application::ResourceViewApp.send :remove_const, :ResourceViewSpec
-    end
+    Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
   end
 
   it "will match on GET requests" do

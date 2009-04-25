@@ -11,16 +11,19 @@ describe "A resource definition" do
         at ["defspec"], "somefile" => :DefSpec
       }
     }
+
+    module ResDefModule; end
   end
 
   after :all do
     Waves.applications.clear
-    REST::Application.send :remove_const, :DefApp
+    Object.send :remove_const, :ResDefModule
+    Object.send :remove_const, :DefApp
   end
 
   after :each do
-    if REST::Application::DefApp.const_defined?(:DefSpec)
-      REST::Application::DefApp.send :remove_const, :DefSpec
+    if Object.const_defined?(:DefSpec)
+      Object.send :remove_const, :DefSpec
     end
   end
 

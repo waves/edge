@@ -19,13 +19,11 @@ describe "Createability definition for a resource" do
 
   after :all do
     Waves.applications.clear
-    REST::Application.send :remove_const, :ResourceCreateApp
+    Object.send :remove_const, :ResourceCreateApp
   end
 
   after :each do
-    if REST::Application::ResourceCreateApp.const_defined?(:ResourceCreateSpec)
-      REST::Application::ResourceCreateApp.send :remove_const, :ResourceCreateSpec
-    end
+    Object.send :remove_const, :ResourceCreateSpec if Object.const_defined?(:ResourceCreateSpec)
   end
 
   it "is available through the method #viewable in a resource definition" do
@@ -50,13 +48,11 @@ describe "Matcher created by a viewable definition" do
 
   after :all do
     Waves.applications.clear
-    REST::Application.send :remove_const, :ResourceCreateApp
+    Object.send :remove_const, :ResourceCreateApp
   end
 
   after :each do
-    if REST::Application::ResourceCreateApp.const_defined?(:ResourceCreateSpec)
-      REST::Application::ResourceCreateApp.send :remove_const, :ResourceCreateSpec
-    end
+    Object.send :remove_const, :ResourceCreateSpec if Object.const_defined?(:ResourceCreateSpec)
   end
 
   it "will match on POST requests" do

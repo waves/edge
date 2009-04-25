@@ -76,7 +76,7 @@ end
 describe "Composing resources in the Application definition" do
   after :each do
     Waves.applications.clear
-    REST::Application.send :remove_const, :DefSpecApp if REST::Application.const_defined?(:DefSpecApp)
+    Object.send :remove_const, :DefSpecApp if Object.const_defined?(:DefSpecApp)
   end
 
   it "uses the .at method to map mount points to filenames, aliased to a name" do
@@ -112,7 +112,7 @@ describe "Composing resources in the Application definition" do
       }
     }
 
-    REST::Application::DefSpecApp.const_defined?(:Mounts).should == true
+    DefSpecApp.const_defined?(:Mounts).should == true
   end
 
   # @todo This needs a functional counterpart to actually verify the call. --rue
@@ -164,7 +164,7 @@ describe "An Application supporting a resource" do
 
   after :each do
     Waves.applications.clear
-    REST::Application.send :remove_const, :DefSpecApp if REST::Application.const_defined?(:DefSpecApp)
+    Object.send :remove_const, :DefSpecApp if Object.const_defined?(:DefSpecApp)
   end
 
   it "provides it a full pathspec given the resource-specific part using .url_for" do
@@ -173,7 +173,7 @@ describe "An Application supporting a resource" do
       viewable { representation("text/html") {} }
     }
 
-    pathspec = Waves.main.url_for(Waves.main::DefSpecRes, [{:path => 0..-1}, :name])
+    pathspec = Waves.main.url_for(DefSpecRes, [{:path => 0..-1}, :name])
     pathspec.should == ["foobar", :something, {:path => 0..-1}, :name]
   end
 
