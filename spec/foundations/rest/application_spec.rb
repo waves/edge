@@ -61,7 +61,7 @@ describe "Defining an Application" do
   it "adds the Application to the application list" do
     Waves.applications.should be_empty
 
-    myapp = nil
+    myapp = Object.new
     application(:DefSpecApp) {
       myapp = self
       composed_of { at [true], "hi" => :Hi }
