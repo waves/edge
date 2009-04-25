@@ -3,11 +3,12 @@ module Waves
   # A temporary measure until the applications "array" becomes a hash.
   # Currently used to keep track of all loaded Waves applications.
   class Applications < Array
+    # @todo Yeah, uh, this does not work this way. --rue
     def []( name ) ; self.find { |app| app == name.to_s.camel_case } ; end
   end
-  
+
   def self.config; instance.config ; end
-  
+
   # The list of all loaded applications
   def self.applications ; @applications ||= Applications.new ; end
 
@@ -21,10 +22,10 @@ module Waves
 
   # Returns the most recently created instance of Waves::Runtime.
   def self.instance ; Waves::Runtime.instance ; end
-  
+
   def self.version ; File.read( File.expand_path( "#{File.dirname(__FILE__)}/../../../doc/VERSION" ) ) ; end
   def self.license ; File.read( File.expand_path( "#{File.dirname(__FILE__)}/../../../doc/LICENSE" ) ) ; end
-  
+
   def self.method_missing(name,*args,&block)
     cache_method_missing name, "instance.#{name}( *args, &block)", *args, &block
   end
@@ -47,7 +48,7 @@ module Waves
 
     # The 'mode' of the runtime determines which configuration it will run under.
     def mode ; options[:mode]||:development ; end
-    
+
     # Returns true if debug was set to true in the current configuration.
     def debug? ; options[:debugger] or config.debug ; end
 

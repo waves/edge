@@ -10,17 +10,26 @@ include Waves::Foundations
 
 describe "Createability definition for a resource" do
   before :all do
-    Object.send :remove_const, :CreateSpec if Object.const_defined?(:CreateSpec)
+    application(:ResourceCreateApp) {
+      composed_of {
+        at ["createspec"], "somefile" => :ResourceCreateSpec
+      }
+    }
+  end
+
+  after :all do
+    Waves.applications.clear
+    Object.send :remove_const, :ResourceCreateApp
   end
 
   after :each do
-    Object.send :remove_const, :CreateSpec if Object.const_defined?(:CreateSpec)
+    Object.send :remove_const, :ResourceCreateSpec if Object.const_defined?(:ResourceCreateSpec)
   end
 
   it "is available through the method #viewable in a resource definition" do
     lambda {
-      resource :CreateSpec do
-        url_of_form :hi
+      resource :ResourceCreateSpec do
+        url_of_form [:hi]
 
         creatable {}
       end
@@ -30,17 +39,26 @@ end
 
 describe "Matcher created by a viewable definition" do
   before :all do
-    Object.send :remove_const, :CreateSpec if Object.const_defined?(:CreateSpec)
+    application(:ResourceCreateApp) {
+      composed_of {
+        at ["createspec"], "somefile" => :ResourceCreateSpec
+      }
+    }
+  end
+
+  after :all do
+    Waves.applications.clear
+    Object.send :remove_const, :ResourceCreateApp
   end
 
   after :each do
-    Object.send :remove_const, :CreateSpec if Object.const_defined?(:CreateSpec)
+    Object.send :remove_const, :ResourceCreateSpec if Object.const_defined?(:ResourceCreateSpec)
   end
 
   it "will match on POST requests" do
     mock(REST::Resource).on(:post, anything, anything)
 
-    resource :CreateSpec do
+    resource :ResourceCreateSpec do
       url_of_form [{:path => 0..-1}, :name]
 
       creatable {
@@ -52,7 +70,7 @@ describe "Matcher created by a viewable definition" do
   it "looks for the given requested type(s)" do
     mock(REST::Resource).on(:post, anything, hash_including(:requested => ["text/javascript"]))
 
-    resource :CreateSpec do
+    resource :ResourceCreateSpec do
       url_of_form [{:path => 0..-1}, :name]
 
       creatable {
@@ -62,15 +80,11 @@ describe "Matcher created by a viewable definition" do
   end
 
   it "is defined for the path constructed by .url_of_form" do
-    pathspec = ["prefeex", {:path => 0..-1}, :name]
-
-    mock(REST::Application).make_url_for(anything, [{:path => 0..-1}, :name]) {
-      pathspec
-    }
+    pathspec = ["createspec", {:path => 0..-1}, :name]
 
     mock(REST::Resource).on(:post, pathspec, anything)
 
-    resource :CreateSpec do
+    resource :ResourceCreateSpec do
       url_of_form [{:path => 0..-1}, :name]
 
       creatable {

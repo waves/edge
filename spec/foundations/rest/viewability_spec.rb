@@ -8,17 +8,26 @@ include Waves::Foundations
 
 describe "Viewability definition for a resource" do
   before :all do
-    Object.send :remove_const, :ViewSpec if Object.const_defined?(:ViewSpec)
+    application(:ResourceViewApp) {
+      composed_of {
+        at ["createspec"], "somefile" => :ResourceViewSpec
+      }
+    }
+  end
+
+  after :all do
+    Waves.applications.clear
+    Object.send :remove_const, :ResourceViewApp
   end
 
   after :each do
-    Object.send :remove_const, :ViewSpec if Object.const_defined?(:ViewSpec)
+    Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
   end
 
   it "is available through the method #viewable in a resource definition" do
     lambda {
-      resource :ViewSpec do
-        url_of_form :hi
+      resource :ResourceViewSpec do
+        url_of_form [:hi]
 
         viewable {}
       end
@@ -28,17 +37,26 @@ end
 
 describe "The set of representations supported by a resource" do
   before :all do
-    Object.send :remove_const, :ViewSpec if Object.const_defined?(:ViewSpec)
+    application(:ResourceViewApp) {
+      composed_of {
+        at ["createspec"], "somefile" => :ResourceViewSpec
+      }
+    }
+  end
+
+  after :all do
+    Waves.applications.clear
+    Object.send :remove_const, :ResourceViewApp
   end
 
   after :each do
-    Object.send :remove_const, :ViewSpec if Object.const_defined?(:ViewSpec)
+    Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
   end
 
   it "is defined through the #representation method inside a #viewable block" do
     lambda {
-      resource :ViewSpec do
-        url_of_form :hi
+      resource :ResourceViewSpec do
+        url_of_form [:hi]
 
         viewable {
           representation {}
@@ -50,17 +68,26 @@ end
 
 describe "A representation definition" do
   before :all do
-    Object.send :remove_const, :ViewSpec if Object.const_defined?(:ViewSpec)
+    application(:ResourceViewApp) {
+      composed_of {
+        at ["createspec"], "somefile" => :ResourceViewSpec
+      }
+    }
+  end
+
+  after :all do
+    Waves.applications.clear
+    Object.send :remove_const, :ResourceViewApp
   end
 
   after :each do
-    Object.send :remove_const, :ViewSpec if Object.const_defined?(:ViewSpec)
+    Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
   end
 
   it "takes the MIME type the representation is for" do
     lambda {
-      resource :ViewSpec do
-        url_of_form :hi
+      resource :ResourceViewSpec do
+        url_of_form [:hi]
 
         viewable {
           representation("text/html") {}
@@ -71,8 +98,8 @@ describe "A representation definition" do
 
   it "allows more than one MIME type to be specified" do
     lambda {
-      resource :ViewSpec do
-        url_of_form :hi
+      resource :ResourceViewSpec do
+        url_of_form [:hi]
 
         viewable {
           representation("text/html", "application/xml+xhtml") {}
@@ -84,8 +111,8 @@ describe "A representation definition" do
   it "defines a matcher" do
     mock(Waves::Matchers::Request).new(anything)
 
-    resource :ViewSpec do
-      url_of_form :hi
+    resource :ResourceViewSpec do
+      url_of_form [:hi]
 
       viewable {
         representation("text/javascript") {}
@@ -97,17 +124,26 @@ end
 # @todo This is somewhat unscientific. --rue
 describe "Matcher created by a viewable definition" do
   before :all do
-    Object.send :remove_const, :ViewSpec if Object.const_defined?(:ViewSpec)
+    application(:ResourceViewApp) {
+      composed_of {
+        at ["viewspec"], "somefile" => :ResourceViewSpec
+      }
+    }
+  end
+
+  after :all do
+    Waves.applications.clear
+    Object.send :remove_const, :ResourceViewApp
   end
 
   after :each do
-    Object.send :remove_const, :ViewSpec if Object.const_defined?(:ViewSpec)
+    Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
   end
 
   it "will match on GET requests" do
     mock(REST::Resource).on(:get, anything, anything)
 
-    resource :ViewSpec do
+    resource :ResourceViewSpec do
       url_of_form [{:path => 0..-1}, :name]
 
       viewable {
@@ -119,7 +155,7 @@ describe "Matcher created by a viewable definition" do
   it "looks for the given requested type(s)" do
     mock(REST::Resource).on(:get, anything, hash_including(:requested => ["text/javascript"]))
 
-    resource :ViewSpec do
+    resource :ResourceViewSpec do
       url_of_form [{:path => 0..-1}, :name]
 
       viewable {
@@ -129,15 +165,11 @@ describe "Matcher created by a viewable definition" do
   end
 
   it "is defined for the path constructed by .url_of_form" do
-    pathspec = ["prefeex", {:path => 0..-1}, :name]
-
-    mock(REST::Application).make_url_for(anything, [{:path => 0..-1}, :name]) {
-      pathspec
-    }
+    pathspec = ["viewspec", {:path => 0..-1}, :name]
 
     mock(REST::Resource).on(:get, pathspec, anything)
 
-    resource :ViewSpec do
+    resource :ResourceViewSpec do
       url_of_form [{:path => 0..-1}, :name]
 
       viewable {

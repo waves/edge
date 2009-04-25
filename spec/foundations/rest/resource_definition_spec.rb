@@ -2,21 +2,49 @@ require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "spec_hel
 
 # Our stuff
 require "waves/foundations/rest"
+include Waves::Foundations
+
+fail "Need to spec #defined_in and #needed_from_URL"
 
 describe "A resource definition" do
   before :all do
-    Object.send :remove_const, :DefSpec if Object.const_defined?(:DefSpec)
+    application(:DefApp) {
+      composed_of {
+        at ["defspec"], "somefile" => :DefSpec
+      }
+    }
+
+    module ResDefModule; end
+  end
+
+  after :all do
+    Waves.applications.clear
+    Object.send :remove_const, :ResDefModule
+    Object.send :remove_const, :DefApp
   end
 
   after :each do
-    Object.send :remove_const, :DefSpec if Object.const_defined?(:DefSpec)
+    if Object.const_defined?(:DefSpec)
+      Object.send :remove_const, :DefSpec
+    end
   end
 
   it "takes a single Symbol argument for the resource name" do
     lambda { resource(:DefSpec) {} }.should_not raise_error
   end
 
-  it "defines a class using the given name" do
+  it "defines a class with given name as constant under its nesting" do
+    ResDefModule.const_defined?(:DefSpec).should == false
+
+    module ResDefModule
+      resource(:DefSpec) {}
+    end
+
+    ResDefModule.const_defined?(:DefSpec).should == true
+    ResDefModule::DefSpec.class.should == Class
+  end
+
+  it "defines a class with given name as constant if not nested" do
     Object.const_defined?(:DefSpec).should == false
 
     resource(:DefSpec) {}
@@ -39,11 +67,7 @@ describe "A resource definition" do
   it "raises an error when defining 'methods' if the URL form has not been defined" do
     lambda {
       resource(:DefSpec) { viewable {} }
-    }.should raise_error
-
-    lambda {
-      resource(:DefSpec) { creatable {} }
-    }.should raise_error
+    }.should raise_error(REST::BadDefinition)
   end
 
 end

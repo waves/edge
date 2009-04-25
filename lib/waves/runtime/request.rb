@@ -171,6 +171,7 @@ module Waves
         return @requested
       end
 
+      # This needs to be an Accept < Array
       @requested = accept.unshift Mime::Unspecified
     end
 

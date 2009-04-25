@@ -1,3 +1,6 @@
+require "ostruct"
+
+require "waves/ext/string"
 require "waves/resources/mixin"
 
 module Waves
@@ -7,16 +10,98 @@ module Waves
 
       # Some kind of a malformed resource definition
       #
-      class BadDefinition < ::Exception; end
+      class BadDefinition < StandardError; end
 
 
       # Applications are formal, rather than ad-hoc Waves apps.
       #
       class Application
+
+        class << self
+
+          # Resources this application is composed of.
+          #
+          attr_reader :resources
+
+        end
+
+        # Associate mountpoint with a file path for resource.
+        #
+        # Path is stored expanded to absolute for matching.
+        # You can leave the .rb out if you really like.
+        #
+        # @see  .look_in
+        #
+        def self.at(mountpoint, path)
+          @composition << [path, mountpoint]
+        end
+
+        # Resource composition block.
+        #
+        # In this block, the Application defines all of the
+        # resources it is composed of (and their prefixes or
+        # "mountpoints.") The resources themselves are not
+        # defined here.
+        #
+        # The order of composition is stored and used.
+        #
+        # @see  .at
+        # @see  ConvenienceMethods#resource
+        #
+        def self.composed_of(&block)
+          @composition ||= []
+          instance_eval &block
+
+          mounts = const_set :Mounts, Class.new(Waves::Resources::Base)
+
+          # Only construct the Hash here to retain order for .on()s
+          @resources ||= {}
+
+          @composition.each {|path, mountpoint|
+            path = path.to_s.snake_case if Symbol === path
+
+            path << ".rb" unless path =~ /\.rb$/
+
+            found = if @look_in
+                      @look_in.find {|prefix|
+                        candidate = File.expand_path File.join(prefix, path)
+                        break candidate if File.exist? candidate
+                      }
+                    else
+                      path = File.expand_path path
+                      path if File.exist?(path)
+                    end
+
+            raise ArgumentError, "Path #{path} does not exist!" unless found
+
+            # Resource will register itself when loaded
+            @resources[found] = OpenStruct.new  :mountpoint => mountpoint,
+                                                :resource => nil
+
+            # This, ladies and gentlemen, is evil. Upon
+            # loading the resource registers itself with
+            # the active application, causing this block
+            # to be redefined.
+            mounts.on(true, mountpoint) { load found }
+          }
+        end
+
+        # Path prefixes to look for resource files under.
+        #
+        # Optional trailing /, one or more needed. Each is
+        # checked in the order given.
+        #
+        def self.look_in(*prefixes)
+          @look_in = prefixes
+        end
+
         # Construct and possibly override URL for a resource.
         #
-        def self.make_url_for(resource, urlspec)
-          urlspec
+        # @todo This may be obsolete, move to registration? --rue
+        #
+        def self.url_for(resource)
+          info = Waves.main.resources[resource.defined_in]
+          info.mountpoint + resource.needed_from_url
         end
       end
 
@@ -64,7 +149,7 @@ module Waves
         # means that type of override is rare in practice.
         #
         def self.url_of_form(spec)
-          @pathspec = Application.make_url_for self, spec
+          @pathspec = Application.url_for self, spec
         end
 
         # Viewability definition block (GET)
@@ -85,10 +170,33 @@ module Waves
       #
       module ConvenienceMethods
 
+        # Application definition block.
+        #
+        def application(name, &block)
+          app = Class.new Application, &block
+
+          if app.resources.nil? or app.resources.empty?
+            raise BadDefinition, "No resource composition!"
+          end
+
+          mod = if Module === self then self else Object end
+          mod.const_set name, app
+
+          Waves << app
+        end
+
         # Resource definition block.
         #
+        # @todo Must change the Waves.main to *current* app.
+        #
         def resource(name, &block)
-          Object.const_set name, Class.new(REST::Resource, &block)
+          mod = if Module === self then self else Object end
+
+          # We must eval this, because the constant really needs
+          # to be defined at the point we are running the body
+          # code. --rue
+          res = mod.const_set name, Class.new(Resource)
+          res.instance_eval &block
         end
 
       end
