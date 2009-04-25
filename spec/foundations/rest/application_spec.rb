@@ -6,20 +6,43 @@ require "waves/foundations/rest"
 include Waves::Foundations
 
 describe "Defining an Application" do
+  before :all do
+    module AppDefModule; end
+  end
+
+  after :all do
+    Object.send :remove_const, :AppDefModule
+  end
 
   after :each do
     Waves.applications.clear
-    REST::Application.send :remove_const, :DefSpecApp if REST::Application.const_defined?(:DefSpecApp)
+    AppDefModule.send :remove_const, :DefSpecApp if AppDefModule.const_defined?(:DefSpecApp)
+    Object.send :remove_const, :DefSpecApp if Object.const_defined?(:DefSpecApp)
   end
 
   # @todo Much fleshing out here. Overrides and such. --rue
 
-  it "is created as named constant under REST::Application using given name" do
-    REST::Application.const_defined?(:DefSpecApp).should == false
+  it "is created as a class by given name under the nesting module" do
+    AppDefModule.const_defined?(:DefSpecApp).should == false
+
+    module AppDefModule
+      application(:DefSpecApp) {
+        composed_of { at [true], "hi" => :Hi }
+      }
+    end
+
+    AppDefModule.const_defined?(:DefSpecApp).should == true
+    Object.const_defined?(:DefSpecApp).should == false
+  end
+
+  it "is created as a class by given name under Object if not nested" do
+    Object.const_defined?(:DefSpecApp).should == false
+
     application(:DefSpecApp) {
       composed_of { at [true], "hi" => :Hi }
     }
-    REST::Application.const_defined?(:DefSpecApp).should == true
+
+    Object.const_defined?(:DefSpecApp).should == true
   end
 
   it "raises an error unless some resource composition is done" do
@@ -46,7 +69,6 @@ describe "Defining an Application" do
 
     Waves.applications.size.should == 1
     Waves.main.should == myapp
-    Waves.main.name.split(/::/).last.should == "DefSpecApp"
   end
 end
 
