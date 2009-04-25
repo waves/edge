@@ -25,13 +25,15 @@ module Waves
 
         end
 
-        # Associate mountpoint with a file and a constant.
+        # Associate mountpoint with a file path for resource.
         #
-        def self.at(mountpoint, map)
-          file, constant = *map.to_a.first
-          constant = constant.to_s.snake_case.to_sym
-
-          @composition << [constant, OpenStruct.new(:file => file, :mountpoint => mountpoint)]
+        # Path is stored expanded to absolute for matching.
+        # You can leave the .rb out if you really like.
+        #
+        # @see  .look_in
+        #
+        def self.at(mountpoint, path)
+          @composition << [path, mountpoint]
         end
 
         # Resource composition block.
@@ -43,7 +45,8 @@ module Waves
         #
         # The order of composition is stored and used.
         #
-        # @see  .at()
+        # @see  .at
+        # @see  ConvenienceMethods#resource
         #
         def self.composed_of(&block)
           @composition ||= []
@@ -54,15 +57,47 @@ module Waves
           # Only construct the Hash here to retain order for .on()s
           @resources ||= {}
 
-          @composition.each {|name, info|
-            @resources[name] = info
-            mounts.on(true, info.mountpoint) { to name }
+          @composition.each {|path, mountpoint|
+            path = path.to_s.snake_case if Symbol === path
+
+            path << ".rb" unless path =~ /\.rb$/
+
+            found = if @look_in
+                      @look_in.find {|prefix|
+                        candidate = File.expand_path File.join(prefix, path)
+                        break candidate if File.exist? candidate
+                      }
+                    else
+                      path = File.expand_path path
+                      path if File.exist?(path)
+                    end
+
+            raise ArgumentError, "Path #{path} does not exist!" unless found
+
+            # Resource will register itself when loaded
+            @resources[found] = OpenStruct.new  :mountpoint => mountpoint,
+                                                :resource => nil
+
+            # This, ladies and gentlemen, is evil. Upon
+            # loading the resource registers itself with
+            # the active application, causing this block
+            # to be redefined.
+            mounts.on(true, mountpoint) { load found }
           }
+        end
+
+        # Path prefixes to look for resource files under.
+        #
+        # Optional trailing /, one or more needed. Each is
+        # checked in the order given.
+        #
+        def self.look_in(*prefixes)
+          @look_in = prefixes
         end
 
         # Construct and possibly override URL for a resource.
         #
-        # @todo Support overrides here. --rue
+        # @todo This may be obsolete, move to registration? --rue
         #
         def self.url_for(resource, pathspec)
           info = Waves.main.resources[resource.name.split(/::/).last.snake_case.to_sym]
