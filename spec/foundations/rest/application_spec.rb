@@ -346,25 +346,35 @@ describe "An Application supporting a resource" do
 
     application(:AppDefSpec) {
       composed_of {
-        at ["support", :something], "resources/supporter_one.rb"
+        at ["support", :something], "supporter_one.rb"
+        look_in "resources"
       }
     }
+
+    @fullpath = File.expand_path(File.join(Dir.pwd, "resources", "supporter_one.rb"))
+    module AppDefSpecMod; end
   end
 
   after :each do
     Waves.applications.clear
+    Object.send :remove_const, :AppDefSpecMod if Object.const_defined?(:AppDefSpecMod)
     Object.send :remove_const, :AppDefSpec if Object.const_defined?(:AppDefSpec)
   end
 
   # @todo Dunno if this applies at all anymore, probably better
   #       in registration, but the principle is the same. --rue
   it "provides it a full pathspec given the resource-specific part using .url_for" do
-    mock(fake = Object.new) do
-      defined_in() { File.expand_path "resources/supporter_one.rb" }
-      needed_from_url() { [{:path => 0..-1}, :name] }
-    end
+    mock(Kernel).load(@fullpath) {
+      module AppDefSpecMod
+        resource(:SupporterUno) { url_of_form [{:path => 0..-1}, :name] }
+      end
+      true
+    }
 
-    pathspec = Waves.main.url_for fake
+    request = Waves::Request.new env("http://example.com/support/the_whales", :method => "GET")
+    Waves.main::Mounts.new(request).process
+
+    pathspec = Waves.main.url_for AppDefSpecMod::SupporterUno
     pathspec.should == ["support", :something, {:path => 0..-1}, :name]
   end
 end
