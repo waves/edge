@@ -19,9 +19,11 @@ module Waves
 
         class << self
 
+          # File that this Application is currently loading if any.
+          attr_reader   :loading
+
           # Resources this application is composed of.
-          #
-          attr_reader :resources
+          attr_reader   :resources
 
         end
 
@@ -76,14 +78,26 @@ module Waves
 
             # Resource will register itself when loaded
             @resources[found] = OpenStruct.new  :mountpoint => mountpoint,
-                                                :resource => nil
+                                                :actual => nil
 
             # This, ladies and gentlemen, is evil. Upon
             # loading the resource registers itself with
             # the active application, causing this block
             # to be redefined.
-            mounts.on(true, mountpoint) { load found }
+            mounts.on(true, mountpoint) { Waves.main.load found }
           }
+        end
+
+        # Override normal loading to access file being loaded.
+        #
+        # Used by the first-load hook, see .composed_of.
+        #
+        def self.load(path)
+          @loading = path
+          Kernel.load path
+
+        ensure
+          @loading = nil
         end
 
         # Path prefixes to look for resource files under.
