@@ -165,6 +165,14 @@ module Waves
           @method = nil
         end
 
+        # The bits we need from an URL.
+        #
+        # Essentially just exposes the pathspec given in .url_of_form.
+        #
+        def self.needed_from_url()
+          @needed_from_url
+        end
+
         # Representation definition block
         #
         def self.representation(*types, &block)
@@ -181,7 +189,8 @@ module Waves
         # means that type of override is rare in practice.
         #
         def self.url_of_form(spec)
-          @pathspec = Application.url_for self, spec
+          @needed_from_url = spec
+          @pathspec = Application.url_for self
         end
 
         # Viewability definition block (GET)
