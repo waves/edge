@@ -222,8 +222,15 @@ describe "Composing resources in the Application definition" do
     res = Waves.main.resources[full]
     res.mountpoint.should == ["mount4"]
   end
+end
 
-  it "sets the file(s) from .at to load when the mountpoint is hit" do
+describe "First time hitting a mountpoint for an Application" do
+  after :each do
+    Waves.applications.clear
+    Object.send :remove_const, :AppDefSpec if Object.const_defined?(:AppDefSpec)
+  end
+
+  it "loads the file set for the mount in the composition" do
     mock(File).exist?(satisfy {|f| f =~ %r{resources/at_third\.rb$} }) { true }
 
     application(:AppDefSpec) {
@@ -271,6 +278,27 @@ describe "Composing resources in the Application definition" do
 
     $app_first_resource_loading.should == a
     Waves.main.loading.should == nil
+  end
+
+  it "redefines the mountpoint .on action" do
+    mock(File).exist?(%r{resources.at_firstload\.rb$}) { true }
+
+    application(:AppDefSpec) {
+      composed_of {
+        at ["mount7"], "resources/at_firstload.rb"
+      }
+    }
+
+    full = File.expand_path "resources/at_firstload.rb"
+
+    mock(Kernel).load(full) { true }
+    stub.instance_of(Waves.main::Mounts).to { true }
+
+    # @todo Unscientific. --rue
+    mock(Waves::Resources::Base).on(true, ["mount7"])
+
+    request = Waves::Request.new env("http://example.com/mount7", :method => "GET")
+    Waves.main::Mounts.new(request).process
   end
 end
 
