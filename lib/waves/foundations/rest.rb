@@ -109,14 +109,32 @@ module Waves
           @look_in = prefixes
         end
 
+        # Allow resource to register itself when loaded.
+        #
+        # The path-indexed entry is completed with the actual resource
+        # and a mirror version is created, indexed by the resource itself.
+        #
+        # @todo Is there any point trying to add better failure
+        #       if the path is unknown? Probably not. --rue
+        #
+        def self.register(resource)
+          entry = @resources[@loading]
+          entry.actual = resource
+
+          # Mirror
+          @resources[resource] = OpenStruct.new :mountpoint => entry.mountpoint,
+                                                :path => @loading
+        end
+
         # Construct and possibly override URL for a resource.
         #
         # @todo This may be obsolete, move to registration? --rue
         #
         def self.url_for(resource)
-          info = Waves.main.resources[resource.defined_in]
+          info = Waves.main.resources[resource]
           info.mountpoint + resource.needed_from_url
         end
+
       end
 
       # Base class to use for resources.
@@ -201,15 +219,18 @@ module Waves
 
         # Resource definition block.
         #
-        # @todo Must change the Waves.main to *current* app.
+        # @todo Must change the Waves.main to *current* app. --rue
         #
         def resource(name, &block)
           mod = if Module === self then self else Object end
 
+          res = mod.const_set name, Class.new(Resource)
+
+          Waves.main.register res
+
           # We must eval this, because the constant really needs
           # to be defined at the point we are running the body
           # code. --rue
-          res = mod.const_set name, Class.new(Resource)
           res.instance_eval &block
         end
 
