@@ -4,13 +4,14 @@ require File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "spec_hel
 require "waves/foundations/rest"
 include Waves::Foundations
 
-fail "Need to spec #defined_in and #needed_from_URL"
-
 describe "A resource definition" do
   before :all do
-    application(:DefApp) {
+    mock(File).exist?(%r{my_resources.resource_def_spec\.rb$}) { true }
+
+    application(:ResourceDefApp) {
       composed_of {
-        at ["defspec"], "somefile" => :DefSpec
+        at ["defspec"], :ResourceDefSpec
+        look_in "my_resources"
       }
     }
 
@@ -20,37 +21,74 @@ describe "A resource definition" do
   after :all do
     Waves.applications.clear
     Object.send :remove_const, :ResDefModule
-    Object.send :remove_const, :DefApp
+    Object.send :remove_const, :ResourceDefApp
   end
 
   after :each do
-    if Object.const_defined?(:DefSpec)
-      Object.send :remove_const, :DefSpec
+    if Object.const_defined?(:ResourceDefSpec)
+      Object.send :remove_const, :ResourceDefSpec
     end
   end
 
   it "takes a single Symbol argument for the resource name" do
-    lambda { resource(:DefSpec) {} }.should_not raise_error
+    mock(ResourceDefApp).register(anything) { true }
+    lambda { resource(:ResourceDefSpec) {} }.should_not raise_error
   end
 
   it "defines a class with given name as constant under its nesting" do
-    ResDefModule.const_defined?(:DefSpec).should == false
+    ResDefModule.const_defined?(:ResourceDefSpec).should == false
+
+    mock(ResourceDefApp).register(anything) { true }
 
     module ResDefModule
-      resource(:DefSpec) {}
+      resource(:ResourceDefSpec) {}
     end
 
-    ResDefModule.const_defined?(:DefSpec).should == true
-    ResDefModule::DefSpec.class.should == Class
+    ResDefModule.const_defined?(:ResourceDefSpec).should == true
+    ResDefModule::ResourceDefSpec.class.should == Class
   end
 
+
   it "defines a class with given name as constant if not nested" do
-    Object.const_defined?(:DefSpec).should == false
+    Object.const_defined?(:ResourceDefSpec).should == false
 
-    resource(:DefSpec) {}
+    mock(ResourceDefApp).register(anything) { true }
 
-    Object.const_defined?(:DefSpec).should == true
-    DefSpec.class.should == Class
+    resource(:ResourceDefSpec) {}
+
+    Object.const_defined?(:ResourceDefSpec).should == true
+    ResourceDefSpec.class.should == Class
+  end
+
+  it "causes an entry to be created in the Application's resource table for itself" do
+    path = File.expand_path(File.join(Dir.pwd, "my_resources", "resource_def_spec.rb"))
+    ResourceDefApp.resources[path].should_not == nil
+
+    mock(Kernel).load(anything) {
+      resource(:ResourceDefSpec) { url_of_form [{:path => 0..-1}, :name] }
+      true
+    }
+
+    request = Waves::Request.new env("http://example.com/defspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
+
+    ResourceDefApp.resources[ResourceDefSpec].should_not == nil
+    ResourceDefApp.resources[path].actual.should == ResourceDefSpec
+  end
+
+  it "includes the path information in the resource table entry" do
+    path = File.expand_path(File.join(Dir.pwd, "my_resources", "resource_def_spec.rb"))
+
+    mock(Kernel).load(anything) {
+      resource(:ResourceDefSpec) { url_of_form [{:path => 0..-1}, :name] }
+      true
+    }
+
+    request = Waves::Request.new env("http://example.com/defspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
+
+    res = ResourceDefApp.resources[ResourceDefSpec]
+    res.path.should == path
   end
 
   # @todo This is kind of annoying to have explicit but not
@@ -59,16 +97,41 @@ describe "A resource definition" do
   # @todo Maybe try to use #/ for defining the URLs for
   #       extra fun.
   it "requires the resource to define the form of its URL" do
-    lambda {
-      resource(:DefSpec) { url_of_form [{:path => 0..-1}, :name] }
-    }.should_not raise_error
+    stub(Kernel).load(anything) {
+      lambda {
+        resource(:ResourceDefSpec) { url_of_form [{:path => 0..-1}, :name] }
+      }.should_not raise_error
+      true
+    }
+
+    request = Waves::Request.new env("http://example.com/defspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
   end
 
   it "raises an error when defining 'methods' if the URL form has not been defined" do
-    lambda {
-      resource(:DefSpec) { viewable {} }
-    }.should raise_error(REST::BadDefinition)
+    stub(Kernel).load(anything) {
+      lambda {
+        resource(:ResourceDefSpec) { viewable {} }
+      }.should raise_error(REST::BadDefinition)
+      true
+    }
+
+    request = Waves::Request.new env("http://example.com/defspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
   end
 
+  it "exposes the URL form through .needed_from_url" do
+    pathspec = [{:path => 0..-1}, :name]
+
+    mock(Kernel).load(anything) {
+      resource(:ResourceDefSpec) { url_of_form pathspec }
+      true
+    }
+
+    request = Waves::Request.new env("http://example.com/defspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
+
+    ResourceDefSpec.needed_from_url.should == pathspec
+  end
 end
 
