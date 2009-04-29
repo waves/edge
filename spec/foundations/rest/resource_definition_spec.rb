@@ -5,7 +5,7 @@ require "waves/foundations/rest"
 include Waves::Foundations
 
 describe "A resource definition" do
-  before :all do
+  before :each do
     mock(File).exist?(%r{my_resources.resource_def_spec\.rb$}) { true }
 
     application(:ResourceDefApp) {
@@ -18,13 +18,10 @@ describe "A resource definition" do
     module ResDefModule; end
   end
 
-  after :all do
+  after :each do
     Waves.applications.clear
     Object.send :remove_const, :ResDefModule
     Object.send :remove_const, :ResourceDefApp
-  end
-
-  after :each do
     if Object.const_defined?(:ResourceDefSpec)
       Object.send :remove_const, :ResourceDefSpec
     end
@@ -69,6 +66,8 @@ describe "A resource definition" do
       true
     }
 
+    stub.instance_of(Waves.main::Mounts).to { true }
+
     request = Waves::Request.new env("http://example.com/defspec", :method => "GET")
     Waves.main::Mounts.new(request).process
 
@@ -84,6 +83,8 @@ describe "A resource definition" do
       true
     }
 
+    stub.instance_of(Waves.main::Mounts).to { true }
+
     request = Waves::Request.new env("http://example.com/defspec", :method => "GET")
     Waves.main::Mounts.new(request).process
 
@@ -91,11 +92,6 @@ describe "A resource definition" do
     res.path.should == path
   end
 
-  # @todo This is kind of annoying to have explicit but not
-  #       automatically present in the def. --rue
-  #
-  # @todo Maybe try to use #/ for defining the URLs for
-  #       extra fun.
   it "requires the resource to define the form of its URL" do
     stub(Kernel).load(anything) {
       lambda {
@@ -103,6 +99,8 @@ describe "A resource definition" do
       }.should_not raise_error
       true
     }
+
+    stub.instance_of(Waves.main::Mounts).to { true }
 
     request = Waves::Request.new env("http://example.com/defspec", :method => "GET")
     Waves.main::Mounts.new(request).process
@@ -116,6 +114,8 @@ describe "A resource definition" do
       true
     }
 
+    stub.instance_of(Waves.main::Mounts).to { true }
+
     request = Waves::Request.new env("http://example.com/defspec", :method => "GET")
     Waves.main::Mounts.new(request).process
   end
@@ -127,6 +127,8 @@ describe "A resource definition" do
       resource(:ResourceDefSpec) { url_of_form pathspec }
       true
     }
+
+    stub.instance_of(Waves.main::Mounts).to { true }
 
     request = Waves::Request.new env("http://example.com/defspec", :method => "GET")
     Waves.main::Mounts.new(request).process

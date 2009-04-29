@@ -235,6 +235,7 @@ describe "Composing resources in the Application definition" do
     full = File.expand_path "resources/at_third.rb"
 
     mock(Kernel).load(full) { true }
+    stub.instance_of(Waves.main::Mounts).to { true }
 
     request = Waves::Request.new env("http://example.com/mount3", :method => "GET")
     Waves.main::Mounts.new(request).process
@@ -254,6 +255,8 @@ describe "Composing resources in the Application definition" do
         look_in File.dirname(a)
       }
     }
+
+    stub.instance_of(Waves.main::Mounts).to.times(any_times) { true }
 
     Waves.main.loading.should == nil
 
@@ -304,6 +307,8 @@ describe "An Application designated to be composed of a given resource" do
       (REST::Resource > res) && res.name == "AppDefSpecMod::Moomin"
     })
 
+    stub.instance_of(Waves.main::Mounts).to { true }
+
     request = Waves::Request.new env("http://example.com/composee/hi", :method => "GET")
     Waves.main::Mounts.new(request).process
   end
@@ -315,6 +320,8 @@ describe "An Application designated to be composed of a given resource" do
       end
       true
     }
+
+    stub.instance_of(Waves.main::Mounts).to { true }
 
     request = Waves::Request.new env("http://example.com/composee/hi", :method => "GET")
     Waves.main::Mounts.new(request).process
@@ -329,6 +336,8 @@ describe "An Application designated to be composed of a given resource" do
       end
       true
     }
+
+    stub.instance_of(Waves.main::Mounts).to { true }
 
     request = Waves::Request.new env("http://example.com/composee/hi", :method => "GET")
     Waves.main::Mounts.new(request).process
@@ -351,6 +360,8 @@ describe "An Application supporting a resource" do
       }
     }
 
+    stub.instance_of(Waves.main::Mounts).to { true }
+
     @fullpath = File.expand_path(File.join(Dir.pwd, "resources", "supporter_one.rb"))
     module AppDefSpecMod; end
   end
@@ -370,6 +381,8 @@ describe "An Application supporting a resource" do
       end
       true
     }
+
+    stub.instance_of(Waves.main::Mounts).to { true }
 
     request = Waves::Request.new env("http://example.com/support/the_whales", :method => "GET")
     Waves.main::Mounts.new(request).process
