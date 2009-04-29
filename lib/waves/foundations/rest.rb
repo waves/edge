@@ -80,21 +80,27 @@ module Waves
             @resources[found] = OpenStruct.new  :mountpoint => mountpoint,
                                                 :actual => nil
 
-            # This, ladies and gentlemen, is evil. Upon
-            # loading the resource registers itself with
-            # the active application, causing this block
-            # to be redefined.
-            mounts.on(true, mountpoint) { Waves.main.load found }
+            # This, ladies and gentlemen, is evil.
+            mounts.on(true, mountpoint) {
+              res = Waves.main.load(found)
+
+              # Replace this for the future
+              mounts.on(true, mountpoint) { to res }
+              to res
+            }
           }
         end
 
         # Override normal loading to access file being loaded.
         #
         # Used by the first-load hook, see .composed_of.
+        # Returns the newly loaded resource.
         #
         def self.load(path)
           @loading = path
           Kernel.load path
+
+          @resources[path].actual
 
         ensure
           @loading = nil
