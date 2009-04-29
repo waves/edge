@@ -20,8 +20,6 @@ describe "Defining an Application" do
     Object.send :remove_const, :AppDefSpec if Object.const_defined?(:AppDefSpec)
   end
 
-  # @todo Much fleshing out here. Overrides and such. --rue
-
   it "is created as a class by given name under the nesting module" do
     AppDefModule.const_defined?(:AppDefSpec).should == false
 
@@ -210,25 +208,8 @@ describe "Composing resources in the Application definition" do
     }
   end
 
-  it "sets the file(s) from .at to load when the mountpoint is hit" do
-    mock(File).exist?(satisfy {|f| f =~ %r{resources.at_third\.rb$} }) { true }
-
-    application(:AppDefSpec) {
-      composed_of {
-        at ["mount3"], "resources/at_third.rb"
-      }
-    }
-
-    full = File.expand_path "resources/at_third.rb"
-
-    mock.instance_of(Waves.main::Mounts).load(full) { true }
-
-    request = Waves::Request.new env("http://example.com/mount3", :method => "GET")
-    Waves.main::Mounts.new(request).process
-  end
-
   it "stores the file paths given in .at as keys of .resources" do
-    mock(File).exist?(satisfy {|f| f =~ %r{resources.at_fourth\.rb$} }) { true }
+    mock(File).exist?(satisfy {|f| f =~ %r{resources/at_fourth\.rb$} }) { true }
 
     application(:AppDefSpec) {
       composed_of {
@@ -240,6 +221,122 @@ describe "Composing resources in the Application definition" do
 
     res = Waves.main.resources[full]
     res.mountpoint.should == ["mount4"]
+  end
+
+  it "sets the file(s) from .at to load when the mountpoint is hit" do
+    mock(File).exist?(satisfy {|f| f =~ %r{resources/at_third\.rb$} }) { true }
+
+    application(:AppDefSpec) {
+      composed_of {
+        at ["mount3"], "resources/at_third.rb"
+      }
+    }
+
+    full = File.expand_path "resources/at_third.rb"
+
+    mock(Kernel).load(full) { true }
+
+    request = Waves::Request.new env("http://example.com/mount3", :method => "GET")
+    Waves.main::Mounts.new(request).process
+  end
+
+  it "sets the file being loaded as the .loading file for the Application when loading it" do
+    mock(File).exist?(%r{app_first_resource_load_a\.rb$}) { true }
+    mock(File).exist?(%r{app_first_resource_load_b\.rb$}) { true }
+
+    a = File.expand_path(File.join(File.dirname(__FILE__), "fixtures", "app_first_resource_load_a.rb"))
+    b = File.expand_path(File.join(File.dirname(__FILE__), "fixtures", "app_first_resource_load_b.rb"))
+
+    application(:AppDefSpec) {
+      composed_of {
+        at ["first_load_one"], :AppFirstResourceLoadA
+        at ["first_load_two"], :AppFirstResourceLoadB
+        look_in File.dirname(a)
+      }
+    }
+
+    Waves.main.loading.should == nil
+
+    request = Waves::Request.new env("http://example.com/first_load_two", :method => "GET")
+    Waves.main::Mounts.new(request).process
+
+    $app_first_resource_loading.should == b
+    Waves.main.loading.should == nil
+
+    request = Waves::Request.new env("http://example.com/first_load_one", :method => "GET")
+    Waves.main::Mounts.new(request).process
+
+    $app_first_resource_loading.should == a
+    Waves.main.loading.should == nil
+  end
+end
+
+describe "An Application designated to be composed of a given resource" do
+  before :each do
+    mock(File).exist?(anything) { true }
+
+    application(:AppDefSpec) {
+      composed_of {
+        at ["composee", :something], "composee.rb"
+        look_in "resources"
+      }
+    }
+
+    @fullpath = File.expand_path(File.join(Dir.pwd, "resources", "composee.rb"))
+    module AppDefSpecMod; end
+  end
+
+  after :each do
+    Waves.applications.clear
+    Object.send :remove_const, :AppDefSpecMod if Object.const_defined?(:AppDefSpecMod)
+    Object.send :remove_const, :AppDefSpec if Object.const_defined?(:AppDefSpec)
+  end
+
+  it "allows the resource to register itself when it loads" do
+    mock(Kernel).load(anything) {
+      module AppDefSpecMod
+        resource(:Moomin) { }
+      end
+      true
+    }
+
+    mock(AppDefSpec).register(satisfy {|res|
+      (REST::Resource > res) && res.name == "AppDefSpecMod::Moomin"
+    })
+
+    request = Waves::Request.new env("http://example.com/composee/hi", :method => "GET")
+    Waves.main::Mounts.new(request).process
+  end
+
+  it "adds the resource in the path entry in the resource table" do
+    mock(Kernel).load(@fullpath) {
+      module AppDefSpecMod
+        resource(:Meebie) { }
+      end
+      true
+    }
+
+    request = Waves::Request.new env("http://example.com/composee/hi", :method => "GET")
+    Waves.main::Mounts.new(request).process
+
+    Waves.main.resources[@fullpath].actual.should == AppDefSpecMod::Meebie
+  end
+
+  it "creates an entry for the resource itself with the info from resources" do
+    mock(Kernel).load(@fullpath) {
+      module AppDefSpecMod
+        resource(:Uggabugga) { }
+      end
+      true
+    }
+
+    request = Waves::Request.new env("http://example.com/composee/hi", :method => "GET")
+    Waves.main::Mounts.new(request).process
+
+    Waves.main.resources[@fullpath].actual.should == AppDefSpecMod::Uggabugga
+    res = Waves.main.resources[AppDefSpecMod::Uggabugga]
+    res.path.should == @fullpath
+    res.mountpoint.should == Waves.main.resources[@fullpath].mountpoint
   end
 end
 
