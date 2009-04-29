@@ -300,6 +300,29 @@ describe "First time hitting a mountpoint for an Application" do
     request = Waves::Request.new env("http://example.com/mount7", :method => "GET")
     Waves.main::Mounts.new(request).process
   end
+
+  it "forwards the request to the resource once it is loaded" do
+    mock(File).exist?(%r{resources.at_firstload_2\.rb$}) { true }
+
+    application(:AppDefSpec) {
+      composed_of {
+        at ["mount8"], "resources/at_firstload_2.rb"
+      }
+    }
+
+    full = File.expand_path "resources/at_firstload_2.rb"
+
+    mock(Kernel).load(full) {
+      resource(:Mibble) {}
+    }
+
+    mock.instance_of(Waves.main::Mounts).to(satisfy {|res|
+      (REST::Resource > res) && res.name == "Mibble"
+    }) { true }
+
+    request = Waves::Request.new env("http://example.com/mount8", :method => "GET")
+    Waves.main::Mounts.new(request).process
+  end
 end
 
 describe "An Application designated to be composed of a given resource" do
