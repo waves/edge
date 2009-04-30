@@ -149,7 +149,7 @@ module Waves
       # methods.
       #
       # @todo Should maybe insulate the term -> HTTP method
-      #       mapping a bit more. --rue
+      #       mapping a bit more. Or less. --rue
       #
       class Resource
         # @todo Direct include/extend to avoid having to use
@@ -202,7 +202,7 @@ module Waves
 
         # The bits we need from an URL.
         #
-        # Essentially just exposes the pathspec given in .url_of_form.
+        # Essentially just exposes the pathspec given to .url_of_form.
         #
         def self.needed_from_url()
           @needed_from_url
