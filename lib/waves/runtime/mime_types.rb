@@ -2,9 +2,8 @@ module Waves
 
   # Waves::MimeTypes defines an interface for adding MIME types used in mapping requests
   # to content types. Originally taken from Mongrel.
-
+  #
   module MimeTypes
-
     def self.[](path)
       mapping[path]
     end
@@ -17,9 +16,7 @@ module Waves
     def self.mapping
       @mapping ||= Waves::MIME_TYPES
     end
-
   end
-
 
   module Mime
     # Unspecified MIME type.
@@ -32,6 +29,12 @@ module Waves
     Unspecified = "application/vnd.com.rubywaves.undefined"
   end
 
+  # File extension to MIME type mapping. See MimeTypes.
+  #
+  # Each extension may later become to point to an Array of
+  # MIME types rather than a single one. This is accounted
+  # for when matching.
+  #
   MIME_TYPES = {
     ".skd"=>"application/x-koan",
     ".el"=>"text/x-script.elisp",
@@ -543,9 +546,18 @@ module Waves
     ".mif"=>"application/x-mif"
   }
 
-  # Unspecified MIME type
+  # MIME type to extension mapping.
   #
-  # Generally used 
+  # Broadly the inverse of MimeTypes, but there may be
+  # some differences in usage. MimeExts type indexes
+  # always point to an Array of extensions.
+  #
+  MimeExts = Hash.new {|h, k| h[k] = [] }
+
+  # Build MimeExts
+  MIME_TYPES.each {|key, value|
+    MimeExts[value] << key
+  }
 
 end
 
