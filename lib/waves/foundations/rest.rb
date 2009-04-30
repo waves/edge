@@ -136,9 +136,9 @@ module Waves
         #
         # @todo This may be obsolete, move to registration? --rue
         #
-        def self.url_for(resource)
+        def self.url_for(resource, pathspec)
           info = Waves.main.resources[resource]
-          info.mountpoint + resource.needed_from_url
+          info.mountpoint + pathspec
         end
 
       end
@@ -200,14 +200,6 @@ module Waves
           }
         end
 
-        # The bits we need from an URL.
-        #
-        # Essentially just exposes the pathspec given to .url_of_form.
-        #
-        def self.needed_from_url()
-          @needed_from_url
-        end
-
         # Representation definition block
         #
         def self.representation(*types, &block)
@@ -224,8 +216,7 @@ module Waves
         # means that type of override is rare in practice.
         #
         def self.url_of_form(spec)
-          @needed_from_url = spec
-          @pathspec = Application.url_for self
+          @pathspec = Application.url_for self, spec
         end
 
         # Viewability definition block (GET)

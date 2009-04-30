@@ -119,22 +119,6 @@ describe "A resource definition" do
     Waves.main::Mounts.new(request).process
   end
 
-  it "exposes the URL form through .needed_from_url" do
-    pathspec = [{:path => 0..-1}, :name]
-
-    mock(Kernel).load(anything) {
-      resource(:ResourceDefSpec) { url_of_form pathspec }
-      true
-    }
-
-    stub.instance_of(Waves.main::Mounts).to { true }
-
-    request = Waves::Request.new env("http://example.com/defspec", :method => "GET")
-    Waves.main::Mounts.new(request).process
-
-    ResourceDefSpec.needed_from_url.should == pathspec
-  end
-
   it "allows introducing new MIME types and their extensions" do
     mock(Kernel).load(anything) {
       resource :ResourceDefSpec do

@@ -438,8 +438,8 @@ describe "An Application supporting a resource" do
     request = Waves::Request.new env("http://example.com/support/the_whales", :method => "GET")
     Waves.main::Mounts.new(request).process
 
-    pathspec = Waves.main.url_for AppDefSpecMod::SupporterUno
-    pathspec.should == ["support", :something, {:path => 0..-1}, :name]
+    pathspec = Waves.main.url_for AppDefSpecMod::SupporterUno, ["haa"]
+    pathspec.should == ["support", :something, "haa"]
   end
 end
 
