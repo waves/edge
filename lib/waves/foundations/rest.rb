@@ -171,6 +171,35 @@ module Waves
           @method = nil
         end
 
+        # Introduce new MIME type and its extension(s)
+        #
+        # This is used to allow resources to differentiate between
+        # different kinds of representations (or content types.)
+        # For example, a Wiki page resource may introduce a MIME
+        # type for an "editable" representation, which then allows
+        # producing the appropriate editor interface. The MIME types
+        # added thusly should follow the normal semantics, which means
+        # that usually they will be of the form "application/vnd.somestring".
+        # As an example, the Unspecified MIME type is defined in Waves
+        # as "vnd.com.rubywaves.unspecified".
+        #
+        # The users can communicate the desired MIME type either the
+        # correct way of using the Accept header or, commonly with a
+        # web browser, by using the extension.
+        #
+        def self.introduce_mime(type, options)
+          exts = Array(options[:exts])
+          raise ArgumentError, "Must give file extensions for MIME!" if exts.empty?
+
+          Waves::MimeExts[type] += exts
+          Waves::MimeExts[type].uniq!
+
+          exts.each {|ext|
+            Waves::MimeTypes[ext] << type
+            Waves::MimeTypes[ext].uniq!
+          }
+        end
+
         # The bits we need from an URL.
         #
         # Essentially just exposes the pathspec given in .url_of_form.
