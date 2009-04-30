@@ -26,7 +26,7 @@ module Waves
     #
     # @see  Request#accept
     #
-    Unspecified = "application/vnd.com.rubywaves.undefined"
+    Unspecified = "application/vnd.com.rubywaves.unspecified"
   end
 
   # File extension to MIME type mapping. See MimeTypes.
