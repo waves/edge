@@ -7,12 +7,14 @@ describe "MIME type mapping" do
   # @todo Needs some heavy improvement.. --rue
   it "provides a mapping from extensions to MIME types" do
     Waves.const_defined?(:MimeTypes).should == true
-    Waves::MimeTypes[".txt"].should == "text/plain"
+    Waves::MimeTypes[".txt"].should == ["text/plain"]
   end
 
   it "makes a reverse mapping of MimeTypes available as MimeExts" do
-    Waves::MimeTypes.mapping.each {|key, value|
-      Waves::MimeExts[value].include?(key).should == true
+    Waves::MimeTypes.each {|key, values|
+      values.each {|value|
+        Waves::MimeExts[value].include?(key).should == true
+      }
     }
   end
 
