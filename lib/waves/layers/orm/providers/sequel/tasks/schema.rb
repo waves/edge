@@ -1,4 +1,5 @@
 require "#{File.dirname(__FILE__)}/../../../migration"
+require 'sequel/extensions/migration'
 
 namespace :schema do
 
@@ -9,6 +10,7 @@ namespace :schema do
 
   desc "Performs Sequel migrations to version=<version>"
   task :migrate do |task|
+
     version = ENV['version']; version = version.to_i unless version.nil?
     Sequel::Migrator.apply( Waves.main.database, Waves::Layers::ORM.migration_directory , version )
   end
