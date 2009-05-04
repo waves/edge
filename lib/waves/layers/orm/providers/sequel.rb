@@ -1,7 +1,7 @@
 module Waves
   module Layers
     module ORM # :nodoc:
-      
+
       # The Sequel ORM layer sets up the Sequel connection and configures AutoCode on Models, so that constants in that
       # namespace get loaded from file or created as subclasses of Models::Default.  The dataset for models is set to the
       # snakecased version of the model's class name.
@@ -10,7 +10,7 @@ module Waves
         # - creates on the application module a database method that establishes the Sequel connection
         # - arranges for autoloading/autocreation of missing constants in the Models namespace
         # - defines Sequel-specific helper methods on Waves::Controllers::Base
-        # 
+        #
         # The controller helper methdods are:
         # - all
         # - find(name)
@@ -18,25 +18,25 @@ module Waves
         # - delete(name)
         # - update(name)
         #
-        
-        
+
+
         def self.included(app)
-          
           gem 'sequel', '>= 2.0.0'
           require 'sequel'
           require "#{File.dirname(__FILE__)}/sequel/tasks/schema" if defined?(Rake)
           require "#{File.dirname(__FILE__)}/sequel/tasks/generate" if defined?(Rake)
-          
-          def app.database ; @sequel ||= ::Sequel.open( Waves.config.database ) ; end
-                      
+
+          def app.database ; @sequel ||= ::Sequel.connect( Waves.config.database ) ; end
+          #make a connection.
+          app.database
           app.auto_create_module( :Models ) do
             auto_create_class :Default, ::Sequel::Model
             auto_load :Default, :directories => [ :models ]
             auto_create_class true, :Default
             auto_load true, :directories => [ :models ]
-            
+
             # set the Sequel dataset based on the model class name
-            # note that this is not done for app::Models::Default, as it isn't 
+            # note that this is not done for app::Models::Default, as it isn't
             # supposed to represent a table
             auto_eval true do
               next if self.basename == "Default"
@@ -47,13 +47,13 @@ module Waves
                 set_dataset Waves.main.database[ basename.snake_case.pluralize.intern ]
               end
             end
-            
+
           end
-            
+
           Waves::Controllers::Base.instance_eval do
             include Waves::Layers::ORM::Sequel::ControllerMethods
           end
-            
+
         end
 
         # Mixed into Waves::Controllers::Base.  Provides ORM-specific helper methods for model access.
@@ -61,27 +61,28 @@ module Waves
           def all
             model.all
           end
-          
+
           def find( name )
             model[ :name => name ] or not_found
           end
-          
-          def create
-            model.create( attributes.to_hash )
+
+          def create(attrs = nil)
+            ats = attrs || attributes
+            model.create( ats.to_hash )
           end
-          
+
           def delete( name )
             find( name ).destroy
           end
-          
+
           def update( name )
             instance = find( name )
             instance.update_with_params( attributes.to_hash )
             instance
           end
         end
-        
-      end    
+
+      end
     end
   end
 end
