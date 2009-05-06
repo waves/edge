@@ -5,13 +5,20 @@ rescue LoadError => e
   raise e
 end
 
-runtime_deps = { :rack => '~> 0.4', 'rack-cache' => '~> 0.2',
-  :extensions => '~> 0.6', :english => '~> 0.3',
-  :live_console => '~> 0.2', :functor => '>= 0.5.0',
-  :rakegen => '~> 0.6', :autocode => '>= 1.0.0',
-  :filebase => '>= 0.3.5', :RedCloth => '~> 4.0',
-  :choice => '~> 0.1', :metaid => '~> 1.0', :daemons => '~>1.0.10',
-}
+runtime_deps = {:rack => '~> 0.4',
+                'rack-cache' => '~> 0.2',
+                :extensions => '~> 0.6',
+                :english => '~> 0.3',
+                :live_console => '~> 0.2',
+                :functor => '>= 0.5.0',
+                :rakegen => '~> 0.6',
+                :autocode => '>= 1.0.0',
+                :filebase => '>= 0.3.5',
+                :RedCloth => '~> 4.0',
+                :choice => '~> 0.1',
+                :metaid => '~> 1.0',
+                :daemons => '~>1.0.10'
+               }
 
 developer_deps = { :bacon => '~> 1.0', :facon => '~> 0.4' }
 
@@ -117,6 +124,11 @@ task( :setup ) do
   # Add build-time dependencies, like this:
   dependencies.each do |dep|
     if gems.find_name(dep.name, dep.version_requirements).empty?
+      if dep.name =~ /spicycode-micronaut/
+        puts "\n\n***\nYou will need to install micronaut by hand.\n  # gem sources -a http://gems.github.com\n   # (sudo) gem install spicycode- micronaut\n\n"
+        raise LoadError, "Required dependency 'micronaut' missing. Install by hand through github gem."
+      end
+
       puts "Installing dependency: #{dep}"
       begin
         require 'rubygems/dependency_installer'
