@@ -1,22 +1,22 @@
 require 'haml'
 
 module Waves
-  
+
   module Renderers
 
     module Haml
-      
+
       Extension = :haml
-      
+
       # extend Waves::Renderers::Mixin
-      
+
       def self.included(app)
         Waves::Views.renderers << self
         Waves::Views::Base.send(:include, self::ViewMethods)
       end
-      
+
       module ViewMethods
-        
+
         def haml(string, assigns={})
           engine = ::Haml::Engine.new( string )
           scope = Scope.new
@@ -27,9 +27,9 @@ module Waves
           end
           engine.render(scope, assigns)
         end
-        
+
       end
-      
+
       # def self.render( path, assigns )
       #   engine = ::Haml::Engine.new( template( path ) )
       #   scope = Scope.new
@@ -40,7 +40,7 @@ module Waves
       #   end
       #   engine.render(scope, assigns)
       # end
-      
+
       class Scope
         include Waves::Helpers::DocType
         include Waves::Helpers::Layouts
@@ -58,7 +58,7 @@ module Waves
       end
 
     end
-  
+
   end
 
 end
