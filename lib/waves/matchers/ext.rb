@@ -41,7 +41,7 @@ module Waves
       #
       def call(request)
         return @constraints[:noext] unless request.ext
-        return @constraints[:ext].any? {|ext| ext == request.ext }
+        return @constraints[:ext].any? {|ext| ext == request.ext || ext == '.*'}
       end
 
     end
