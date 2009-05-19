@@ -19,9 +19,11 @@ module Waves
 
         class << self
 
+          # File that this Application is currently loading if any.
+          attr_reader   :loading
+
           # Resources this application is composed of.
-          #
-          attr_reader :resources
+          attr_reader   :resources
 
         end
 
@@ -76,14 +78,32 @@ module Waves
 
             # Resource will register itself when loaded
             @resources[found] = OpenStruct.new  :mountpoint => mountpoint,
-                                                :resource => nil
+                                                :actual => nil
 
-            # This, ladies and gentlemen, is evil. Upon
-            # loading the resource registers itself with
-            # the active application, causing this block
-            # to be redefined.
-            mounts.on(true, mountpoint) { load found }
+            # This, ladies and gentlemen, is evil.
+            mounts.on(true, mountpoint) {
+              res = Waves.main.load(found)
+
+              # Replace this for the future
+              mounts.on(true, mountpoint) { to res }
+              to res
+            }
           }
+        end
+
+        # Override normal loading to access file being loaded.
+        #
+        # Used by the first-load hook, see .composed_of.
+        # Returns the newly loaded resource.
+        #
+        def self.load(path)
+          @loading = path
+          Kernel.load path
+
+          @resources[path].actual
+
+        ensure
+          @loading = nil
         end
 
         # Path prefixes to look for resource files under.
@@ -95,14 +115,32 @@ module Waves
           @look_in = prefixes
         end
 
+        # Allow resource to register itself when loaded.
+        #
+        # The path-indexed entry is completed with the actual resource
+        # and a mirror version is created, indexed by the resource itself.
+        #
+        # @todo Is there any point trying to add better failure
+        #       if the path is unknown? Probably not. --rue
+        #
+        def self.register(resource)
+          entry = @resources[@loading]
+          entry.actual = resource
+
+          # Mirror
+          @resources[resource] = OpenStruct.new :mountpoint => entry.mountpoint,
+                                                :path => @loading
+        end
+
         # Construct and possibly override URL for a resource.
         #
         # @todo This may be obsolete, move to registration? --rue
         #
-        def self.url_for(resource)
-          info = Waves.main.resources[resource.defined_in]
-          info.mountpoint + resource.needed_from_url
+        def self.url_for(resource, pathspec)
+          info = Waves.main.resources[resource]
+          info.mountpoint + pathspec
         end
+
       end
 
       # Base class to use for resources.
@@ -111,7 +149,7 @@ module Waves
       # methods.
       #
       # @todo Should maybe insulate the term -> HTTP method
-      #       mapping a bit more. --rue
+      #       mapping a bit more. Or less. --rue
       #
       class Resource
         # @todo Direct include/extend to avoid having to use
@@ -131,6 +169,35 @@ module Waves
           instance_eval &block
         ensure
           @method = nil
+        end
+
+        # Introduce new MIME type and its extension(s)
+        #
+        # This is used to allow resources to differentiate between
+        # different kinds of representations (or content types.)
+        # For example, a Wiki page resource may introduce a MIME
+        # type for an "editable" representation, which then allows
+        # producing the appropriate editor interface. The MIME types
+        # added thusly should follow the normal semantics, which means
+        # that usually they will be of the form "application/vnd.somestring".
+        # As an example, the Unspecified MIME type is defined in Waves
+        # as "vnd.com.rubywaves.unspecified".
+        #
+        # The users can communicate the desired MIME type either the
+        # correct way of using the Accept header or, commonly with a
+        # web browser, by using the extension.
+        #
+        def self.introduce_mime(type, options)
+          exts = Array(options[:exts])
+          raise ArgumentError, "Must give file extensions for MIME!" if exts.empty?
+
+          Waves::MimeExts[type] += exts
+          Waves::MimeExts[type].uniq!
+
+          exts.each {|ext|
+            Waves::MimeTypes[ext] << type
+            Waves::MimeTypes[ext].uniq!
+          }
         end
 
         # Representation definition block
@@ -187,15 +254,18 @@ module Waves
 
         # Resource definition block.
         #
-        # @todo Must change the Waves.main to *current* app.
+        # @todo Must change the Waves.main to *current* app. --rue
         #
         def resource(name, &block)
           mod = if Module === self then self else Object end
 
+          res = mod.const_set name, Class.new(Resource)
+
+          Waves.main.register res
+
           # We must eval this, because the constant really needs
           # to be defined at the point we are running the body
           # code. --rue
-          res = mod.const_set name, Class.new(Resource)
           res.instance_eval &block
         end
 

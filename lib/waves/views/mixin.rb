@@ -41,7 +41,7 @@ module Waves
       module Ext
         # Render the template found in the directory named after this view (snake cased, of course)
         # E.g. App::Views::Gnome.new.render( "stink" ) would look for templates/gnome/stink.<ext>
-        
+
         def render( name, assigns={})
           file = template_file(name)
           ext = File.extname(file).slice(1..-1)
@@ -53,12 +53,12 @@ module Waves
         # E.g. App::Views::Gnome.new.stink would look for templates/gnome/stink
         def method_missing(name,*args) ; render( name, *args ) ; end
       end
-      
+
     end
 
     class Base ; include Mixin ; end
 
   end
-  
+
 
 end

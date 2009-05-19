@@ -1,17 +1,17 @@
 require 'choice'
 require 'rakegen'
 
-waves = File.expand_path( File.dirname( __FILE__ ) / '..' / '..' )
+waves = File.expand_path( File.dirname( __FILE__ ) / '..' / '..' / '..' )
 orms = Dir[ waves / :lib / :layers / :orm / :providers / '*.rb' ].map { |path| File.basename( path, '.rb' )}
 templates = Dir[ waves / :templates / '*' ].map { |path| File.basename( path ) }
 
 Choice.options do
-  
+
   option :help  do
     long '--help'
     desc 'Show this message'
   end
-  
+
   option :orm do
     short '-o'
     long '--orm=ORM'

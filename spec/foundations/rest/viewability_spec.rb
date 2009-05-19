@@ -7,175 +7,245 @@ require "waves/matchers/request"
 include Waves::Foundations
 
 describe "Viewability definition for a resource" do
-  before :all do
+  before :each do
+    mock(File).exist?(%r{resources.resource_view_spec\.rb$}) { true }
+
     application(:ResourceViewApp) {
       composed_of {
-        at ["createspec"], "somefile" => :ResourceViewSpec
+        at ["vjuuspec"], :ResourceViewSpec
+        look_in "resources"
       }
     }
-  end
 
-  after :all do
-    Waves.applications.clear
-    Object.send :remove_const, :ResourceViewApp
+    module ResourceViewSpecMod; end
   end
 
   after :each do
+    Waves.applications.clear
     Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
+    Object.send :remove_const, :ResourceViewSpecMod
+    Object.send :remove_const, :ResourceViewApp
   end
 
   it "is available through the method #viewable in a resource definition" do
-    lambda {
-      resource :ResourceViewSpec do
-        url_of_form [:hi]
+    mock(Kernel).load(anything) {
+      lambda {
+        resource :ResourceViewSpec do
+          url_of_form [:hi]
+          viewable {}
+        end
+      }.should_not raise_error
+      true
+    }
 
-        viewable {}
-      end
-    }.should_not raise_error
+    stub.instance_of(Waves.main::Mounts).to { true }
+
+    request = Waves::Request.new env("http://example.com/vjuuspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
   end
 end
 
 describe "The set of representations supported by a resource" do
-  before :all do
+  before :each do
+    mock(File).exist?(%r{resources.resource_view_spec\.rb$}) { true }
+
     application(:ResourceViewApp) {
       composed_of {
-        at ["createspec"], "somefile" => :ResourceViewSpec
+        at ["vjuuspec"], :ResourceViewSpec
+        look_in "resources"
       }
     }
-  end
 
-  after :all do
-    Waves.applications.clear
-    Object.send :remove_const, :ResourceViewApp
+    module ResourceViewSpecMod; end
   end
 
   after :each do
+    Waves.applications.clear
     Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
+    Object.send :remove_const, :ResourceViewSpecMod
+    Object.send :remove_const, :ResourceViewApp
   end
 
   it "is defined through the #representation method inside a #viewable block" do
-    lambda {
-      resource :ResourceViewSpec do
-        url_of_form [:hi]
+    mock(Kernel).load(anything) {
+      lambda {
+        resource :ResourceViewSpec do
+          url_of_form [:hi]
+          viewable {
+            representation {}
+          }
+        end
+      }.should_not raise_error
+      true
+    }
 
-        viewable {
-          representation {}
-        }
-      end
-    }.should_not raise_error
+    stub.instance_of(Waves.main::Mounts).to { true }
+
+    request = Waves::Request.new env("http://example.com/vjuuspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
   end
 end
 
 describe "A representation definition" do
-  before :all do
+  before :each do
+    mock(File).exist?(%r{resources.resource_view_spec\.rb$}) { true }
+
     application(:ResourceViewApp) {
       composed_of {
-        at ["createspec"], "somefile" => :ResourceViewSpec
+        at ["vjuuspec"], :ResourceViewSpec
+        look_in "resources"
       }
     }
-  end
 
-  after :all do
-    Waves.applications.clear
-    Object.send :remove_const, :ResourceViewApp
+    module ResourceViewSpecMod; end
   end
 
   after :each do
+    Waves.applications.clear
     Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
+    Object.send :remove_const, :ResourceViewSpecMod
+    Object.send :remove_const, :ResourceViewApp
   end
 
   it "takes the MIME type the representation is for" do
-    lambda {
-      resource :ResourceViewSpec do
-        url_of_form [:hi]
+    mock(Kernel).load(anything) {
+      lambda {
+        resource :ResourceViewSpec do
+          url_of_form [:hi]
+          viewable {
+            representation("text/html") {}
+          }
+        end
+      }.should_not raise_error
+      true
+    }
 
-        viewable {
-          representation("text/html") {}
-        }
-      end
-    }.should_not raise_error
+    stub.instance_of(Waves.main::Mounts).to { true }
+
+    request = Waves::Request.new env("http://example.com/vjuuspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
   end
 
   it "allows more than one MIME type to be specified" do
-    lambda {
-      resource :ResourceViewSpec do
-        url_of_form [:hi]
+    mock(Kernel).load(anything) {
+      lambda {
+        resource :ResourceViewSpec do
+          url_of_form [:hi]
+          viewable {
+            representation("text/html", "application/xhtml+xml") {}
+          }
+        end
+      }.should_not raise_error
+      true
+    }
 
-        viewable {
-          representation("text/html", "application/xml+xhtml") {}
-        }
-      end
-    }.should_not raise_error
+    stub.instance_of(Waves.main::Mounts).to { true }
+
+    request = Waves::Request.new env("http://example.com/vjuuspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
   end
 
   it "defines a matcher" do
-    mock(Waves::Matchers::Request).new(anything)
+    mock(Waves::Matchers::Request).new(anything).times(2)
 
-    resource :ResourceViewSpec do
-      url_of_form [:hi]
+    mock(Kernel).load(anything) {
+      lambda {
+        resource :ResourceViewSpec do
+          url_of_form [:hi]
+          viewable {
+            representation("text/javascript") {}
+          }
+        end
+      }.should_not raise_error
+      true
+    }
 
-      viewable {
-        representation("text/javascript") {}
-      }
-    end
+    stub.instance_of(Waves.main::Mounts).to { true }
+
+    request = Waves::Request.new env("http://example.com/vjuuspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
   end
 end
 
 # @todo This is somewhat unscientific. --rue
 describe "Matcher created by a viewable definition" do
-  before :all do
+  before :each do
+    mock(File).exist?(%r{resources.resource_view_spec\.rb$}) { true }
+
     application(:ResourceViewApp) {
       composed_of {
-        at ["viewspec"], "somefile" => :ResourceViewSpec
+        at ["vjuuspec"], :ResourceViewSpec
+        look_in "resources"
       }
     }
-  end
 
-  after :all do
-    Waves.applications.clear
-    Object.send :remove_const, :ResourceViewApp
+    module ResourceViewSpecMod; end
   end
 
   after :each do
+    Waves.applications.clear
     Object.send :remove_const, :ResourceViewSpec if Object.const_defined?(:ResourceViewSpec)
+    Object.send :remove_const, :ResourceViewSpecMod
+    Object.send :remove_const, :ResourceViewApp
   end
 
   it "will match on GET requests" do
     mock(REST::Resource).on(:get, anything, anything)
 
-    resource :ResourceViewSpec do
-      url_of_form [{:path => 0..-1}, :name]
+    mock(Kernel).load(anything) {
+      resource :ResourceViewSpec do
+        url_of_form [{:path => 0..-1}, :name]
+          viewable {
+            representation("text/javascript") {}
+          }
+      end
+      true
+    }
 
-      viewable {
-        representation("text/javascript") {}
-      }
-    end
+    stub.instance_of(Waves.main::Mounts).to { true }
+
+    request = Waves::Request.new env("http://example.com/vjuuspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
   end
 
   it "looks for the given requested type(s)" do
     mock(REST::Resource).on(:get, anything, hash_including(:requested => ["text/javascript"]))
 
-    resource :ResourceViewSpec do
-      url_of_form [{:path => 0..-1}, :name]
+    mock(Kernel).load(anything) {
+      resource :ResourceViewSpec do
+        url_of_form [{:path => 0..-1}, :name]
+          viewable {
+            representation("text/javascript") {}
+          }
+      end
+      true
+    }
 
-      viewable {
-        representation("text/javascript") {}
-      }
-    end
+    stub.instance_of(Waves.main::Mounts).to { true }
+
+    request = Waves::Request.new env("http://example.com/vjuuspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
   end
 
   it "is defined for the path constructed by .url_of_form" do
-    pathspec = ["viewspec", {:path => 0..-1}, :name]
+    pathspec = ["vjuuspec", {:path => 0..-1}, :name]
 
     mock(REST::Resource).on(:get, pathspec, anything)
 
-    resource :ResourceViewSpec do
-      url_of_form [{:path => 0..-1}, :name]
+    mock(Kernel).load(anything) {
+      resource :ResourceViewSpec do
+        url_of_form [{:path => 0..-1}, :name]
+          viewable {
+            representation("text/javascript") {}
+          }
+      end
+      true
+    }
 
-      viewable {
-        representation("text/javascript") {}
-      }
-    end
+    stub.instance_of(Waves.main::Mounts).to { true }
+
+    request = Waves::Request.new env("http://example.com/vjuuspec", :method => "GET")
+    Waves.main::Mounts.new(request).process
   end
 
 end

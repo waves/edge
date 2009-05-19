@@ -167,7 +167,7 @@ module Waves
     def requested()
       return @requested if @requested
       if ext
-        @requested = Accept[MimeTypes[ext]]
+        @requested = Accept[*MimeTypes[ext]]
         return @requested
       end
 
