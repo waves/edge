@@ -74,6 +74,22 @@ describe "Defining an Application" do
     Waves.applications.size.should == 1
     Waves.main.should == myapp
   end
+
+  it "allows declaring one or more content type rendering layouts" do
+    mock(File).exist?(anything) { true }
+
+    application(:AppDefSpec) {
+      composed_of { at [true], "hi" }
+    }
+
+    mock(Object).require(%r{layouts/text/(html|plain)\.rb$}) {
+      class AppDefSpec::Layouts::Text; class Html; end; end
+      class AppDefSpec::Layouts::Text; class Plain; end; end
+      true
+    }.times(2)
+
+    lambda { Waves.main.layouts_for "text/html", "text/plain" }.should_not raise_error
+  end
 end
 
 
@@ -399,6 +415,53 @@ describe "An Application designated to be composed of a given resource" do
     res.mountpoint.should == Waves.main.resources[@fullpath].mountpoint
   end
 end
+
+
+describe "Application definition layout declaration" do
+  before :each do
+    stub(File).exist?(anything) { true }
+
+    module AppDefSpecMod
+      application(:AppDefSpec) {
+        composed_of {
+          at :hi, "hi_one.rb"
+        }
+      }
+    end
+
+    @app = Waves.main
+  end
+
+  after :each do
+    Waves.applications.clear
+    Object.send :remove_const, :AppDefSpecMod if Object.const_defined?(:AppDefSpecMod)
+    Object.send :remove_const, :AppDefSpec if Object.const_defined?(:AppDefSpec)
+  end
+
+  it "loads file name mapped from mime type" do
+    mock(Object).require(%r{layouts/application/xhtml\+xml\.rb$}) {
+      class AppDefSpecMod::AppDefSpec::Layouts::Application
+        class Xhtml
+          class Xml
+          end
+        end
+      end
+      true
+    }
+
+    @app.layouts_for "application/xhtml+xml"
+  end
+
+  it "raises error if mapped constant is not available under its Layouts after loading file" do
+    mock(Object).require(%r{layouts/application/xhtml\+xml\.rb$}) { true }
+
+    lambda {
+      @app.layouts_for "application/xhtml+xml"
+    }.should raise_error(NameError)
+  end
+
+end
+
 
 describe "An Application supporting a resource" do
   before :each do
