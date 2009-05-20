@@ -84,7 +84,8 @@ module Waves
             mounts.on(true, mountpoint) {
               res = Waves.main.load(found)
 
-              # Replace this for the future
+              # TODO: This must be deterministically inserted as
+              #       a replacement of the old one.
               mounts.on(true, mountpoint) { to res }
               to res
             }
@@ -276,6 +277,5 @@ module Waves
   end
 end
 
-# We do not play around.
 include Waves::Foundations::REST::ConvenienceMethods
 
