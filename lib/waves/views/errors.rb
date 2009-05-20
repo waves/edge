@@ -3,9 +3,9 @@ require 'waves/helpers/doc_type'
 module Waves
   module Views
     class Errors < Waves::Views::Base
-      
+
       include Waves::Helpers::DocType
-      
+
       def header( title )
         <<-HTML
         <head>
@@ -18,7 +18,7 @@ module Waves
         </head>
         HTML
       end
-    
+
       def not_found_404
         DOCTYPES[ :html4_transitional ]
         <<-HTML
@@ -31,7 +31,7 @@ module Waves
         </html>
         HTML
       end
-    
+
       def server_error_500
         DOCTYPES[ :html4_transitional ]
         <<-HTML
