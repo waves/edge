@@ -108,8 +108,14 @@ module Waves
 
           const_set :Layouts, Module.new unless const_defined? :Layouts
 
+          basedir = if Hash === types.last
+                      types.pop[:in]
+                    else
+                      File.join Dir.pwd, "layouts"
+                    end
+
           types.each {|t|
-            require File.join(Dir.pwd, "layouts", *t.split("/")) + ".rb"
+            require File.expand_path(File.join(basedir, *t.split("/")) + ".rb")
             @layouts[t] = t.split(/\W+/).inject(const_get :Layouts) {|mod, name|
                             mod.const_get name.capitalize
                           }
