@@ -92,6 +92,30 @@ module Waves
           }
         end
 
+        # Declare and load layout rendering support.
+        #
+        # For each MIME type given, / are treated as directory
+        # separators and + are converted to spaces (just in case.)
+        #
+        # Pattern for constant conversion is replacing any \W
+        # with :: and capitalising all resulting names.
+        #
+        # TODO: Provide a way to give some root to load from.
+        #       Just as last parameter being hash probably OK. --rue
+        #
+        def self.layouts_for(*types)
+          @layouts ||= {}
+
+          const_set :Layouts, Module.new unless const_defined? :Layouts
+
+          types.each {|t|
+            require File.join(Dir.pwd, "layouts", *t.split("/")) + ".rb"
+            @layouts[t] = t.split(/\W+/).inject(const_get :Layouts) {|mod, name|
+                            mod.const_get name.capitalize
+                          }
+          }
+        end
+
         # Override normal loading to access file being loaded.
         #
         # Used by the first-load hook, see .composed_of.
