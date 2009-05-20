@@ -460,6 +460,19 @@ describe "Application definition layout declaration" do
     }.should raise_error(NameError)
   end
 
+  it "may be given :in hash parameter at very end to indicate top-level dir instead of ./layouts" do
+    mock(Object).require(%r{weeble/application/xhtml\+xml\.rb$}) {
+      class AppDefSpecMod::AppDefSpec::Layouts::Application
+        class Xhtml
+          class Xml
+          end
+        end
+      end
+      true
+    }
+
+    @app.layouts_for "application/xhtml+xml", :in => "weeble"
+  end
 end
 
 
