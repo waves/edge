@@ -465,7 +465,7 @@ end
 
 describe "An Application supporting a resource" do
   before :each do
-    mock(File).exist?(anything) { true }
+    stub(File).exist?(anything) { true }
 
     application(:AppDefSpec) {
       composed_of {
