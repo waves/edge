@@ -12,15 +12,18 @@ module <%= @name %>
       port 3000
       dependencies []
 
-	  application.use Rack::Session::Cookie,
-	    :key => 'rack.session',
+	    application.use Rack::Session::Cookie,
+	      :key => 'rack.session',
         # :domain => 'foo.com',
         :path => '/',
         :expire_after => 2592000,
         :secret => 'Change it'
+
       application.use ::Rack::Static,
        :urls => [ '/css/', '/javascript/', '/favicon.ico' ],
        :root => 'public'
+
+      application.run ::Waves::Dispatchers::Default.new
 
       server Waves::Servers::Mongrel
     end
