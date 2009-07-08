@@ -84,10 +84,41 @@ module Waves
             mounts.on(true, mountpoint) {
               res = Waves.main.load(found)
 
-              # Replace this for the future
+              # TODO: This must be deterministically inserted as
+              #       a replacement of the old one.
               mounts.on(true, mountpoint) { to res }
               to res
             }
+          }
+        end
+
+        # Declare and load layout rendering support.
+        #
+        # For each MIME type given, / are treated as directory
+        # separators and + are converted to spaces (just in case.)
+        #
+        # Pattern for constant conversion is replacing any \W
+        # with :: and capitalising all resulting names.
+        #
+        # TODO: Provide a way to give some root to load from.
+        #       Just as last parameter being hash probably OK. --rue
+        #
+        def self.layouts_for(*types)
+          @layouts ||= {}
+
+          const_set :Layouts, Module.new unless const_defined? :Layouts
+
+          basedir = if Hash === types.last
+                      types.pop[:in]
+                    else
+                      File.join Dir.pwd, "layouts"
+                    end
+
+          types.each {|t|
+            require File.expand_path(File.join(basedir, *t.split("/")) + ".rb")
+            @layouts[t] = t.split(/\W+/).inject(const_get :Layouts) {|mod, name|
+                            mod.const_get name.capitalize
+                          }
           }
         end
 
@@ -276,6 +307,5 @@ module Waves
   end
 end
 
-# We do not play around.
 include Waves::Foundations::REST::ConvenienceMethods
 

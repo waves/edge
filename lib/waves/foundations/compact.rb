@@ -24,6 +24,8 @@ module Waves
               port 3000
               server Waves::Servers::Mongrel
               resource app::Resources::Map
+
+              application.run ::Waves::Dispatchers::Default.new
             })
             const_set( :Production, Class.new( self::Development ) {
               debug false
