@@ -27,8 +27,6 @@ module Waves
           require "#{File.dirname(__FILE__)}/sequel/tasks/generate" if defined?(Rake)
 
           def app.database ; @sequel ||= ::Sequel.connect( Waves.config.database ) ; end
-          #make a connection.
-          app.database
           app.auto_create_module( :Models ) do
             auto_create_class :Default, ::Sequel::Model
             auto_load :Default, :directories => [ :models ]
