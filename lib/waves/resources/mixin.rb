@@ -81,12 +81,9 @@ module Waves
             rescue Waves::Dispatchers::Redirect => e
               raise e
             rescue Exception => e
-              p :raised, e, e.backtrace, e.message if $DEBUG
               response.status = ( StatusCodes[ e.class ] || 500 )
-              e.backtrace
               ( body = handler( e ) ) rescue raise e
-              Waves::Logger.warn "Handled #{e.class}: #{e}"
-              e.backtrace.each { |t| Waves::Logger.debug "    #{t}" }
+              Waves::Logger.warn "Handled #{e.class}: #{e.message}"
             ensure
               always
             end
@@ -101,8 +98,7 @@ module Waves
               begin
                 Waves.main::Resources[ resource ]
               rescue NameError => e
-                Waves::Logger.debug e.to_s
-                e.backtrace.each { |t| Waves::Logger.debug "    #{t}" }
+                Waves::Logger.debug [ e.message, *e.backtrace ].join("\n\t")
                 raise Waves::Dispatchers::NotFoundError
               end
               Waves.main::Resources[ resource ]
