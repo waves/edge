@@ -58,7 +58,7 @@ module Waves
           end
         end
         Waves::Logger.info "#{request.method}: #{request.url} handled in #{(t*1000).round} ms."
-        response.finish
+        return response.finish
       end
 
     end
