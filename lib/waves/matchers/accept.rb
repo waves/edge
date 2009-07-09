@@ -1,5 +1,3 @@
-require "waves/matchers/base"
-
 module Waves
   module Matchers
 
