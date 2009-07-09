@@ -103,14 +103,7 @@ module Waves
     #       of the Unspecified type.
     #
     def requested()
-      return @requested if @requested
-      if ext
-        @requested = Accept[*MimeTypes[ext]]
-        return @requested
-      end
-
-      # This needs to be an Accept < Array
-      @requested = accept.unshift Mime::Unspecified
+      @requested ||= ( extension ? Accept.new( Accept.parse( MimeTypes[ extension ].join(",") ) + accept ).uniq : accept )
     end
 
     # Requested charset(s).
@@ -129,19 +122,11 @@ module Waves
       @lang ||= Accept.parse(@request.env['HTTP_ACCEPT_LANGUAGE'])
     end
 
-    # File extension, with leading dot.
-    #
-    # Usable for MIME lookups too.
-    #
-    # @todo Drop the leading dot?
-    #
-    def ext()
-      return @ext if @ext
-
-      e = File.extname path
-
-      @ext = if e.empty? then nil else e end
+    # File extension of path, with leading dot
+    def extension
+      @ext ||= ( if ( e = File.extname( path )).empty? then nil else e end )
     end
+    alias :ext :extension
 
     module Utilities
 

@@ -4,7 +4,7 @@ module Waves
 
     # @todo Umm.. what all can exist here? --rue
     #
-    class Traits < Base
+    class Traits
       def initialize(pattern)
         raise ArgumentError, "No traits given!" unless pattern
         @pattern = pattern
@@ -15,6 +15,13 @@ module Waves
           ( val.is_a? Proc and val.call( request.traits[ key ] ) ) or val === request.traits[ key ]
         end
       end
+      
+      # Proc-like interface
+      #
+      def [](request)
+        call request
+      end
+      
 
     end
 

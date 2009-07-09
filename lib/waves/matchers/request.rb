@@ -1,27 +1,48 @@
 module Waves
   module Matchers
 
-    # Top-level matcher nesting all others.
-    #
-    class Request < Base
+    class Request
 
-      # Create the top nested set of matchers.
+      attr_accessor :constraints
+
+
       #
       # @todo Further optimise the cases where there are no
       #       constraints. --rue
       #
+
       def initialize(options)
-        # Simplest to fake it if there is no URL to match
-        @uri = Matchers::URI.new(options) rescue lambda { {} }
+        
+        @uri = Matchers::URI.new( options )
 
         @constraints = {}
 
-        # Any of these may or may not be present
-        maybe { @constraints[:requested] = Matchers::Requested.new options }
-        maybe { @constraints[:accept] = Matchers::Accept.new options }
-        maybe { @constraints[:ext] = Matchers::Ext.new options[:ext] }
-        maybe { @constraints[:query] = Matchers::Query.new options[:query] }
-        maybe { @constraints[:traits] = Matchers::Traits.new options[:traits] }
+        if options[ :requested ]
+          @constraints[ :requested ] = Matchers::Requested.new( options[ :requested ] )
+        end
+        
+        if options.key?( :accept ) || options.key?( :lang ) || options.key?( :charset )
+          @constraints[:accept] = Matchers::Accept.new( options ) 
+        end
+        
+        if options.key?( :ext )
+          @constraints[ :ext ] = Matchers::Ext.new(  options[ :ext ] )
+        elsif options.key?( :extension )
+          @constraints[ :ext ] = Matchers::Ext.new(  options[ :extension ] )
+        end
+        
+        if options.key?( :query )
+          @constraints[:query] = Matchers::Query.new( options[:query] ) 
+        end
+          
+        if options[ :traits ]
+          @constraints[ :traits ] = Matchers::Traits.new( options[ :traits ] )
+        end
+          
+        if options[ :when ]
+          @constraints[ :when ] = options[ :when ]
+        end
+        
       end
 
       # Process all matchers for request.
@@ -31,7 +52,33 @@ module Waves
           request.traits.waves.captured = captured
         end
       end
+      
+      #
+      # @todo This could maybe be optimised by detecting
+      #       empty constraints before calling. Not high
+      #       importance. --rue
+      #
+      def test(request)
+        constraints.all? {|key, val|
+          if val.nil? or val == true
+            true
+          else
+            if val.respond_to? :call
+              val.call( request )
+            else
+              val == request.send( key ) or val === request.send( key ) or request.send( key ) === val
+            end
+          end
+        }
+      end
+      
 
+      # Proc-like interface
+      #
+      def [](request)
+        call request
+      end
+      
     end
 
   end

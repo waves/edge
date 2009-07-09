@@ -60,14 +60,6 @@ describe "Response Content-Type header " do
 
   end
 
-  it "Should return the content type in accept if there is no extension" do
-
-    Test::Resources::Map.on(:get, ["foo"], :accept => "text/javascript") { }
-    resp = get "/foo", "HTTP_ACCEPT" => "text/javascript"
-    resp.status.should == 200
-    resp.content_type.should == 'text/javascript'
-  end
-
   it "Should return  content type of ext when its set." do
     Test::Resources::Map.on(:get, ["foo"], :ext => [:js], :accept => "text/html") { }
 

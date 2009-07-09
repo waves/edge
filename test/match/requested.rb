@@ -41,9 +41,10 @@ describe "Requested header matching" do
   end
 
   feature "prefers a present file extension over any Requested" do
+    # note that the order matters here: LIFO, just as tho we were using #define_method
     Test::Resources::Map.on(:get, ["foo"], :requested => "image/png") { "png" }
-    Test::Resources::Map.on(:get, ["foo"], :requested => "text/x-fortran") { "fortran" }
     Test::Resources::Map.on(:get, ["foo"], :requested => "text/javascript") { "js" }
+    Test::Resources::Map.on(:get, ["foo"], :requested => "text/x-fortran") { "fortran" }
 
     resp = get "/foo.f90", "HTTP_ACCEPT" => "text/javascript"
     resp.status.should == 200
@@ -54,38 +55,6 @@ describe "Requested header matching" do
     resp.body.should == "fortran"
   end
 
-  feature "matches for absent extension if MimeTypes::Unspecified is :requested" do
-    Test::Resources::Map.on(:get,
-                            ["foo"],
-                            :requested => [Waves::Mime::Unspecified, "text/html"]) { "undefined" }
-
-    resp = get "/foo", {"HTTP_ACCEPT" => "text/javascript"}
-    resp.status.should == 200
-    resp.body.should == "undefined"
-  end
-
-  feature "follows normal first-match processing for Mime::Unspecified" do
-    Test::Resources::Map.on(:get, ["foo"], :requested => Waves::Mime::Unspecified) { "undefined" }
-    Test::Resources::Map.on(:get, ["foo"], :requested => "text/javascript") { "js" }
-
-    resp = get "/foo", {"HTTP_ACCEPT" => "text/javascript"}
-    resp.status.should == 200
-    resp.body.should == "js"
-  end
-
-  feature "prefers absent extension over Requested, if Mime::Unspecified is :requesteded" do
-    Test::Resources::Map.on(:get, ["foo"], :requested => "text/x-fortran") { "fortran" }
-    Test::Resources::Map.on(:get, ["foo"], :requested => "text/javascript") { "js" }
-    Test::Resources::Map.on(:get, ["foo"], :requested => Waves::Mime::Unspecified) { "undefined" }
-
-    resp = get "/foo", {"HTTP_ACCEPT" => "text/javascript"}
-    resp.status.should == 200
-    resp.body.should == "undefined"
-
-    resp = get "/foo", {"HTTP_ACCEPT" => "text/x-fortran"}
-    resp.status.should == 200
-    resp.body.should == "undefined"
-  end
 
   feature "does not match for absent extension by default" do
     Test::Resources::Map.on(:get,
@@ -137,23 +106,23 @@ describe "Requested header matching" do
     resp.status.should == 404
   end
 
-  feature "requested */* is not matched by anything" do
+  feature "requested */* matches anything" do
     Test::Resources::Map.on(:get, ["foo"], :requested => "*/*") { }
     Test::Resources::Map.on(:get, ["foo"], :requested => "text/*") { }
     Test::Resources::Map.on(:get, ["foo"], :requested => "text/plain") { }
 
-    resp = get "/foo", "HTTP_ACCEPT" => "*/*"
-    resp.status.should == 404
+    resp = get "/foo", "HTTP_ACCEPT" => "text/javascript"
+    resp.status.should == 200
   end
 
-  feature "requested * is not matched by anything" do
+  feature "requested * matches anything" do
     Test::Resources::Map.on(:get, ["foo"], :requested => "*") { }
     Test::Resources::Map.on(:get, ["foo"], :requested => "*/*") { }
     Test::Resources::Map.on(:get, ["foo"], :requested => "text/*") { }
     Test::Resources::Map.on(:get, ["foo"], :requested => "text/plain") { }
 
-    resp = get "/foo", "HTTP_ACCEPT" => "*"
-    resp.status.should == 404
+    resp = get "/foo", "HTTP_ACCEPT" => "text/javascript"
+    resp.status.should == 200
   end
 
   feature "allows multiple MIMEs to be accepted for one representation" do

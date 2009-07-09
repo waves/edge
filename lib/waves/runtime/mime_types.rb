@@ -5,17 +5,6 @@
 #
 module Waves
 
-  module Mime
-    # Unspecified MIME type.
-    #
-    # Primarily used to indicate the absence of a file
-    # extension.
-    #
-    # @see  Request#accept
-    #
-    Unspecified = "application/vnd.com.rubywaves.unspecified"
-  end
-
   # Mapping from file extensions to MIME types.
   #
   # Each extension may have multiple types. Originally

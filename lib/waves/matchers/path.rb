@@ -2,14 +2,13 @@ module Waves
 
   module Matchers
 
-    class Path < Base
-
+    class Path
+      
       # Takes an array of pattern elements ... coming soon, support for formatted strings!
       #
       # Empty Array means no path, but nil is not processed.
       #
       def initialize(pattern)
-        raise ArgumentError, "Path is nil!" unless pattern
         @pattern = pattern
       end
 

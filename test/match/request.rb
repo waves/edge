@@ -46,6 +46,7 @@ describe "Top-level request matcher" do
 
   feature "omits Ext constraints if none given" do
     Waves::Matchers::Request.new({}).constraints.has_key?(:ext).should == false
+    Waves::Matchers::Request.new({}).constraints.has_key?(:extension).should == false
   end
 
   feature "omits Query constraints if none given" do

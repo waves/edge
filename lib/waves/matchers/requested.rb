@@ -3,42 +3,28 @@ require "waves/matchers/base"
 module Waves
   module Matchers
 
-    # Combinatory matcher for accept and extension.
     #
-    class Requested < Base
+    # Matches the MIME-type of the URI path (using the extension)
+    # and, failing that, falls back to the accept header
+    #
+    # Use :extension or :ext for matching the extension itself or
+    # :accept to match the actual HTTP Accept header
+    #
+    
+    class Requested
 
-      # Set up Requested parsing.
-      #
-      # Only the defined constraints are included.
-      #
-      def initialize(options)
-        @constraints = {}
-
-        # Default to accepting text/html
-        if options[:requested] and !options[:requested].empty?
-          @constraints[:requested] = options[:requested]
-        end
-
-        if options[:charset] and !options[:charset].empty?
-          @constraints[:accept_charset] = options[:charset]
-        end
-
-        if options[:lang] and !options[:lang].empty?
-          @constraints[:accept_language] = options[:lang]
-        end
-
-        raise ArgumentError, "No Requested constraints!" if @constraints.empty?
+      def initialize( val ) ; @val = val ; end
+      
+      def call( request )
+        request.requested.include?( @val )
       end
 
-      # Verify that any and all Accept constraints match.
+      # Proc-like interface
       #
-      # Request handles these.
-      #
-      def call(request)
-        @constraints.all? {|key, val|
-          request.send(key).include? val
-        }
+      def [](request)
+        call request
       end
+      
 
     end
 

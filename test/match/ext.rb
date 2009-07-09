@@ -1,4 +1,3 @@
-require "#{File.dirname(__FILE__)}/../../test/helpers.rb"
 require 'test/helpers.rb'
 
 require 'waves/foundations/compact'
@@ -84,8 +83,8 @@ describe "File extension matching" do
     (!!m.call(request)).should == false
   end
 
-  feature "matches absence of extension, returning true, if Array contains empty String" do
-    m = Waves::Matchers::Ext.new [:js, :html, ""]
+  feature "matches absence of extension, returning true, if Array contains false" do
+    m = Waves::Matchers::Ext.new [ :js, :html, false ]
 
     request = Waves::Request.new env("http://example.com/moo",
                                      :method => "GET",
@@ -95,7 +94,7 @@ describe "File extension matching" do
   end
 
   feature "fails to match if extension provided but no extension specified with empty String" do
-    m = Waves::Matchers::Ext.new [""]
+    m = Waves::Matchers::Ext.new( false )
 
     request = Waves::Request.new env("http://example.com/moo.js",
                                      :method => "GET",
@@ -104,21 +103,6 @@ describe "File extension matching" do
     (!!m.call(request)).should == false
   end
 
-  feature "empty String for absence of extension must be in an Array" do
-    begin
-      m = Waves::Matchers::Ext.new("")
-      false
-    rescue ArgumentError
-      true
-    end.should == true
-
-    n = Waves::Matchers::Ext.new [""]
-    request = Waves::Request.new env("http://example.com/moo",
-                                     :method => "GET",
-                                     "HTTP_ACCEPT" => "text/javascript")
-
-    (!!n.call(request)).should == true
-  end
 end
 
 describe "File extension matching in conjunction with Accept matching" do
@@ -160,26 +144,13 @@ describe "File extension matching in conjunction with Accept matching" do
 
   feature "causes Accept match to fail if there is a file extension, and absence is specified" do
     m = Waves::Matchers::Request.new :requested => ["text/javascript"],
-                                     :ext => [""]
+                                     :ext => false
 
     request = Waves::Request.new env("http://example.com/moo.js",
                                      :method => "GET",
                                      "HTTP_ACCEPT" => "text/javascript")
-
     (!!m.call(request)).should == false
   end
-
-  feature "specifying extension is overridden by presence of Unspecified in Accept" do
-    m = Waves::Matchers::Request.new :requested => [Waves::Mime::Unspecified],
-                                     :ext => [:js]
-
-    request = Waves::Request.new env("http://example.com/moo.js",
-                                     :method => "GET",
-                                     "HTTP_ACCEPT" => "text/javascript")
-
-    (!!m.call(request)).should == false
-  end
-
 
 end
 

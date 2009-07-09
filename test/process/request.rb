@@ -33,7 +33,7 @@ describe "Request Object" do
   feature "Access accept headers as Waves::Request::Accept objects" do
     Waves::Request.new(  env( '/', :method => 'GET', 
       'HTTP_ACCEPT_LANGUAGE' => 'en/us' ) ).
-      accept_language.class.should == Waves::Request::Accept
+      accept_language.class.should == Waves::Accept
   end
   
   feature "Access custom headers as methods" do

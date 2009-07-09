@@ -4,7 +4,7 @@ module Waves
 
     # Query parameter matching.
     #
-    class Query < Base
+    class Query
 
       # Create query matcher or fail.
       #
@@ -28,6 +28,13 @@ module Waves
           end
         }
       end
+      
+      # Proc-like interface
+      #
+      def [](request)
+        call request
+      end
+      
 
     end
 

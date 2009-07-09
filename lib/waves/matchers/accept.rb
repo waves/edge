@@ -5,13 +5,14 @@ module Waves
 
     # @todo Rename to Negotiation? --rue
     #
-    class Accept < Base
+    class Accept
 
       # Set up Accept parsing.
       #
       # Only the defined constraints are included.
       #
       def initialize(options)
+        
         @constraints = {}
 
         # Default to accepting text/html
@@ -26,8 +27,7 @@ module Waves
         if options[:lang] and !options[:lang].empty?
           @constraints[:accept_language] = options[:lang]
         end
-
-        raise ArgumentError, "No Accept constraints!" if @constraints.empty?
+        
       end
 
       # Verify that any and all Accept constraints match.
@@ -35,10 +35,15 @@ module Waves
       # Request handles these.
       #
       def call(request)
-        @constraints.all? {|key, val|
-          request.send(key).include? val
-        }
+        @constraints.all? { |key, val| request.send(key).include? val }
       end
+      
+      # Proc-like interface
+      #
+      def [](request)
+        call request
+      end
+      
 
     end
 
