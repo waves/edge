@@ -79,70 +79,8 @@ module Waves
       raise Waves::Dispatchers::Redirect.new( path, status )
     end
 
-    class Accept < Array
-
-      def =~(arg) ; self.include? arg ; end
-      def ===(arg) ; self.include? arg ; end
-
-      # Check these Accepts against constraints.
-      #
-      def include?(arg)
-        return arg.any? {|pat| self.include? pat } if arg.kind_of? Array
-
-        arg = arg.to_s.split "/"
-
-        any? {|entry|
-          # @todo Is this right? --rue
-          next false if entry == '*/*' or entry == '*'
-
-          entry = entry.split('/')
-
-          if arg.size == 1      # Implicit wildcard matches either
-            arg[0] == entry[0] or arg[0] == entry[1]
-          elsif arg[1] == "*"   # Any subtype
-            arg[0] == entry[0]
-          else
-            arg == entry
-          end
-        }
-      end
-
-      # TODO  parsing must be optimized. This parses Accept,
-      #       lang and charset
-      #
-      def self.parse(str)
-        return self.new if str.nil?
-
-        terms = str.scan /([^,][^;]*[^,]*)/
-        terms.map! {|t| extract_term_and_value t.to_s }
-
-        sorted_terms = terms.sort do |term1, term2|
-          term2[1] <=> term1[1]
-        end
-
-        sorted_terms.inject(new) {|value, terms|
-          value << terms[0].split(',').map {|x| x.strip }
-        }.flatten.uniq
-      end
-
-      def self.extract_term_and_value(txt)
-        res = txt.split(';')
-        q = (res.select{ |param| param =~ /q=/})[0]
-        q = q ? q.gsub(/[a-zA-Z =]*/, '').to_f : 1.0
-        [res[0], q]
-      end
-
-      def default()
-        return "text/html" if empty?
-        first
-      end
-
-    end
 
     # Requested representation MIME type
-    #
-    # RFC 2616 section 14.1.
-    #
     def accept()
       @accept ||= Accept.parse(@request.env['HTTP_ACCEPT'])
     end
