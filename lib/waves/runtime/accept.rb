@@ -76,7 +76,7 @@ module Waves
         case term
         when [ type ], [ subtype ], [ true ],
             [ type, subtype ], [ type, true ], 
-            [ true, true ], [ true ] then true
+            [ true, true ] then true
         else false
         end
       }
