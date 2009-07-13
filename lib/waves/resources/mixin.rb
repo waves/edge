@@ -80,9 +80,17 @@ module Waves
               before ;  body = send( request.method ) ; after
             rescue Waves::Dispatchers::Redirect => e
               raise e
-            rescue Exception => e
+            rescue => e
               response.status = ( StatusCodes[ e.class ] || 500 )
-              ( body = handler( e ) ) rescue raise e
+              begin
+                body = handler( e )
+              rescue => f
+                unless f.is_a? NoMethodError # no handler defined
+                  Waves::Logger.error "Exception in handler for #{e.class}."
+                  Waves::Logger.debug [ f.message, *f.backtrace ].join("\n\t")
+                end
+                raise e # re-raise
+              end
               Waves::Logger.warn "Handled #{e.class}: #{e.message}"
             ensure
               always
