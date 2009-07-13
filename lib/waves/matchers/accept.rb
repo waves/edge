@@ -12,19 +12,16 @@ module Waves
       def initialize(options)
         
         @constraints = {}
-
-        # Default to accepting text/html
-        if options[:accept] and !options[:accept].empty?
-          @constraints[:accept] = options[:accept]
-        end
-
-        if options[:charset] and !options[:charset].empty?
-          @constraints[:accept_charset] = options[:charset]
-        end
-
-        if options[:lang] and !options[:lang].empty?
-          @constraints[:accept_language] = options[:lang]
-        end
+        
+        { :accept => :accept, :charset => :accept_charset, :lang => :accept_lang }.each { |key,method|
+          if options[key]
+            if options[key].is_a? Array
+              @constraints[method] = options[key] unless options[key].empty?
+            else
+              @constraints[method] = [ options[key] ]
+            end
+          end
+        }
         
       end
 
