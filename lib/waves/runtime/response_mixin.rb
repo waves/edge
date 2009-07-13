@@ -23,8 +23,8 @@ module Waves
     
     # Both the query and capture merged together
     def params 
-      query = captured ? request.query.merge( captured.to_h ) : request.query
-      @params ||= Waves::Request::Query.new( query ) 
+      @params ||= Waves::Request::Query.new( captured ? 
+        request.query.merge( captured.to_h ) : request.query ) 
     end
     
     %w( session path url domain not_found ).each do | m |

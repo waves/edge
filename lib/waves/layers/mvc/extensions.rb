@@ -40,6 +40,13 @@ module Waves
       @query ||= Waves::Request::Query.new( 
         Waves::Request::Utilities.destructure( request.query ) )
     end
+    
+    # Both the query and capture merged together
+    def params 
+      @params ||= Waves::Request::Query.new( captured ? 
+         Waves::Request::Utilities.destructure( request.query ).merge( captured.to_h ) : 
+          Waves::Request::Utilities.destructure( request.query ) ) 
+    end
 
     # Attributes are just the query elements specific to the model associated with
     # the current resource.
