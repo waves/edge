@@ -37,7 +37,7 @@ module Waves
             auto_eval :Map do
               
               handler( Waves::Dispatchers::NotFoundError ) do
-                app::Views::Errors.new( request ).not_found_404
+                app::Views::Error.new( request ).not_found_404
               end
 
             end
