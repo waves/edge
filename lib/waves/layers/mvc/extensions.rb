@@ -4,16 +4,6 @@ module Waves
     
     module Mixin
       
-      def controller( resource = nil )
-        resource ||= self.class.basename
-        @controller ||= app::Controllers[ resource ].new( @request )
-      end
-      
-      def view( resource = nil )
-        resource ||= self.class.basename
-        @view ||= app::Views[ resource ].new( @request )
-      end
-  
     end
     
   end
@@ -32,7 +22,20 @@ module Waves
     #
     # to find an instance of a given model. Again, the plurality of the controller and
     # model must be the same for this to work.
-    def model; app::Models[ model_name.intern ]; end
+    def model( resource = nil )
+      resource ||= self.class.basename.snake_case
+      app::Models[ resource ]
+    end
+
+    def controller( resource = nil )
+      resource ||= self.class.basename.snake_case
+      @controller ||= app::Controllers[ resource ].new( @request )
+    end
+    
+    def view( resource = nil )
+      resource ||= self.class.basename.snake_case
+      @view ||= app::Views[ resource ].new( @request )
+    end
 
     # MVC Params get automatically destructured with the keys as accessors methods.
     # You can still access the original query by calling request.query

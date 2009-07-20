@@ -35,11 +35,10 @@ module Waves
             auto_create_class true, :Default
             auto_load true, :directories => [ :resources ]
             auto_eval :Map do
-              
               handler( Waves::Dispatchers::NotFoundError ) do
+                request.response.content_type = 'text/html'
                 app::Views::Error.new( request ).not_found_404
               end
-
             end
           end
 

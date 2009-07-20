@@ -75,27 +75,35 @@ module Waves
 
           def initialize( request ); @request = request ; end
 
+          # define defaults for all the functors, providing the analog
+          # of "not implemented" behaviors. this avoids complicating
+          # the error handling with having to distinguish between
+          # functor match-related errors and actual application errors
+          
+          # by default, don't do anything in the wrapper methods
+          before {} ; after {} ; always {}
+
+          # if we get here, this is a 404
+          %w( post get put delete head ).each do | method |
+            on( method ) { not_found }
+          end
+          
+          # default handler is just to propagate the exception
+          handler( Exception ) { |e| raise( e ) }
+
           def process
             begin
-              before ;  body = send( request.method ) ; after
-            rescue Waves::Dispatchers::Redirect => e
-              raise e
+              before ;  rval = send( request.method ) ; after
             rescue => e
               response.status = ( StatusCodes[ e.class ] || 500 )
-              begin
-                body = handler( e )
-              rescue => f
-                unless f.is_a? NoMethodError # no handler defined
-                  Waves::Logger.error "Exception in handler for #{e.class}."
-                  Waves::Logger.debug [ f.message, *f.backtrace ].join("\n\t")
-                end
-                raise e # re-raise
-              end
-              Waves::Logger.warn "Handled #{e.class}: #{e.message}"
+              rval = handler( e )
             ensure
               always
             end
-            return body
+            # note: the dispatcher decides what to do with the
+            # return value; all we care about is returning the
+            # value from the appropriate application block
+            return rval
           end
 
           def to( resource )
@@ -103,12 +111,6 @@ module Waves
             when Base
               resource
             when Symbol, String
-              begin
-                Waves.main::Resources[ resource ]
-              rescue NameError => e
-                Waves::Logger.debug [ e.message, *e.backtrace ].join("\n\t")
-                raise Waves::Dispatchers::NotFoundError
-              end
               Waves.main::Resources[ resource ]
             end
             r = traits.waves.resource = resource.new( request )
@@ -120,13 +122,6 @@ module Waves
           # override for resources that may have long-running requests. this helps servers
           # determine how to handle the request
           def deferred? ; false ; end
-
-          before {} ; after {} ; always {}
-          # handler( Waves::Dispatchers::Redirect ) { |e| raise e }
-
-          %w( post get put delete head ).each do | method |
-            on( method ) { not_found }
-          end
 
         end
 

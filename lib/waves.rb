@@ -3,23 +3,23 @@
 
 # External Dependencies
 require "rubygems"
-  require 'rack'
-  require 'rack/cache'
-  require 'daemons'
+require 'rack'
+require 'rack/cache'
+require 'daemons'
 
-  # a bunch of handy stuff
-  require 'extensions/io'
-  require 'extensions/symbol' unless Symbol.instance_methods.include? 'to_proc'
-  require 'fileutils'
-  require 'metaid'
-  require 'forwardable'
-  require 'date'
-  require 'benchmark'
-  require 'base64'
-  require 'functor'
-  require 'filebase'
-  require 'filebase/model'
-  require 'english/style'
+# a bunch of handy stuff
+require 'extensions/io'
+require 'extensions/symbol' unless Symbol.instance_methods.include? 'to_proc'
+require 'fileutils'
+require 'metaid'
+require 'forwardable'
+require 'date'
+require 'benchmark'
+require 'base64'
+require 'functor'
+require 'filebase'
+require 'filebase/model'
+require 'english/style'
 
 
 # selected project-specific extensions
