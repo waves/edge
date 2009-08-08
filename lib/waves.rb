@@ -19,8 +19,6 @@ require 'base64'
 require 'functor'
 require 'filebase'
 require 'filebase/model'
-require 'english/style'
-
 
 # selected project-specific extensions
 require 'waves/ext/integer'

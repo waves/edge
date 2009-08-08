@@ -13,10 +13,9 @@ module Waves
         require 'autocode'
 
         require 'waves/layers/mvc'
-        require 'waves/layers/inflect/english'
+        require 'waves/layers/text/inflect/english'
+        require 'waves/layers/text/helpers'
         require 'waves/helpers/extended'
-        require 'waves/layers/renderers/erubis'
-        require 'waves/layers/renderers/markaby'
         
         app.module_eval do
 
@@ -42,7 +41,8 @@ module Waves
             end
           end
 
-          include Waves::Layers::Inflect::English
+          include Waves::Layers::Text::Inflect::English
+          include Waves::Layers::Text::Helpers
           include Waves::Layers::MVC
           include Waves::Renderers::Erubis   
           include Waves::Renderers::Markaby   

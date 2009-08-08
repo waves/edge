@@ -2,36 +2,87 @@ module Waves
 
   module Helpers
 
-    # Form helpers are used in generating forms. Since Markaby already provides Ruby
+    # Form helpers are used in generating forms. Since Hoshi already provides Ruby
     # methods for basic form generation, the focus of this helper is on providing templates
-    # to handle things that go beyond the basics. You must define a form template
-    # directory with templates for each type of form element you wish to use. The names
-    # of the template should match the +type+ option provided in the property method.
+    # to handle things that go beyond the basics. 
     #
-    # For example, this code:
+    # Example:
     #
-    #   property :name => 'blog.title', :type => :text, :value => @blog.title
+    # editor( @blog.entry, :heading => 'Edit Blog Entry', :method => :put) {
+    #   property @blog.entry, :name => :title, :type => :text
+    #   property @blog.entry, :name => :content, :type => :text, :size => large
+    #   property @blog.entry, :name => :published?, :type => :boolean
+    # }
     #
-    # will invoke the +text+ form view (the template in +templates/form/text.mab+),
-    # passing in the name ('blog.title') and the value (@blog.title) as instance variables.
-    #
-    # These helpers work best with Markaby, but may work for other Renderers.
-    # 
     
     module Form
 
-      # This method really is a place-holder for common wrappers around groups of
-      # properties. You will usually want to override this. As is, it simply places
-      # a DIV element with class 'properties' around the block.
+      def editor( instance, options = {}) 
+        { :method => :put, :buttons => true, :heading => instance.class.name.in_words.title_case }.merge( options )
+        h1 options[:heading] if options[:heading]
+        form( :method => :post, :action => paths.put( instance.key ) ) {
+          input( :type => :hidden, :name => :_method, :value => :put ) if options[:method] == :put
+          div.properties { yield }
+          p( :class => 'button panel' ) { submit; cancel } if options[:buttons]
+        }
+      end
+
       def properties(&block)
-        div.properties do
+        fieldset do
           yield
         end
       end
 
-      # Invokes the form view for the +type+ given in the option.
-      def property( options )
-        self << view( :form, options[:type], options )
+      def property( instance, options )
+        div( :class => "property #{options[:type]} #{options[:size]}") {
+          label options[:name].capitalize
+          div( :class => 'control' ) { self.send( "#{options[:type]}_field", instance, options ) }
+        }
+      end
+
+      def text_field( instance, options )
+        if options[:size] == :large
+          textarea( instance.send( options[:name] ), 
+            :name => "#{instance.class.basename.snake_case}.#{options[:name]}" )
+        else
+          input( :name =>  "#{instance.class.basename.snake_case}.#{options[:name]}" ), 
+            :type => :text, :value => instance.send( options[:name] ) )
+        end
+      end
+
+      def integer_field( instance, options )
+        input( :name => "#{instance.class.basename.snake_case}.#{options[:name]}", 
+          :type => :text, :value => instance.send( options[:name] ) )
+      end
+
+      def float_field( instance, options )
+        input( :name => "#{instance.class.basename.snake_case}.#{options[:name]}", 
+          :type => :text, :value => instance.send( options[:name] ) )
+      end
+
+      def boolean_field( instance, options )
+        on = instance.send( options[:name] )
+        radio_button( 'Yes', "#{instance.class.basename.snake_case}.#{options[:name]}", 't', on )
+        radio_button( 'No', "#{instance.class.basename.snake_case}.#{options[:name]}", 'f', !on )
+      end
+
+      def radio_button( label, name, value, on )
+        # can't use hoshi input method here thx 2 checked 
+        span label
+        raw( "<input type='radio' name='#{name}' \
+          value='#{value}' #{'checked' if on}/>" )
+      end
+
+      def file_field( instance, options )
+        input( :type => :file, :name => "#{instance.class.basename.snake_case}.#{options[:name]}" )
+      end
+
+      def submit( label = "Save")
+        input :type => :submit, :value => label
+      end
+
+      def cancel( label = "Cancel" )
+        a label, :href => 'javascript:window.history.back()'
       end
 
 

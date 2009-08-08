@@ -12,9 +12,4 @@ class String
   
   def / ( s ) ; File.join( self, s.to_s ); end
   
-  alias_method :lower_camel_case, :subcamelcase
-  alias_method :camel_case, :camelcase
-  alias_method :snake_case, :snakecase
-  alias_method :title_case, :titlecase
-
 end

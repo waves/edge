@@ -15,7 +15,12 @@ module Waves
         end
 
         app.auto_create_module( :Views ) do
-          auto_create_class :Default, Waves::Views::Base
+          auto_create_class :Default, Hoshi::View[:html4_transitional] do
+            include Waves::Views::Mixin
+            include Waves::Helpers::Basic
+            include Waves::Helpers::Formatting
+            include Waves::Helpers::Form
+          end
           auto_load :Default, :directories => [ :views ]
           auto_create_class true, :Default
           auto_load true, :directories => [ :views ]
