@@ -79,6 +79,14 @@ module Waves
           self['application'] ||= Rack::Builder.new
         end
       end
+      
+      def self.use( middleware, options )
+        application.use( middleware, options )
+      end
+      
+      def dispatcher( dispatcher )
+        application.run( dispatcher.new )
+      end
 
       # default options
       debug false

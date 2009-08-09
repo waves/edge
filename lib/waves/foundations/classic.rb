@@ -14,8 +14,6 @@ module Waves
 
         require 'waves/layers/mvc'
         require 'waves/layers/text/inflect/english'
-        require 'waves/layers/text/helpers'
-        require 'waves/helpers/extended'
         
         app.module_eval do
 
@@ -42,7 +40,6 @@ module Waves
           end
 
           include Waves::Layers::Text::Inflect::English
-          include Waves::Layers::Text::Helpers
           include Waves::Layers::MVC
           include Waves::Renderers::Erubis   
           include Waves::Renderers::Markaby   

@@ -3,7 +3,7 @@ module Waves
   module Helpers
 
     # Form helpers are used in generating forms. Since Hoshi already provides Ruby
-    # methods for basic form generation, the focus of this helper is on providing templates
+    # methods for basic form generation, the focus of this helper is on providing methods
     # to handle things that go beyond the basics. 
     #
     # Example:
@@ -45,7 +45,7 @@ module Waves
           textarea( instance.send( options[:name] ), 
             :name => "#{instance.class.basename.snake_case}.#{options[:name]}" )
         else
-          input( :name =>  "#{instance.class.basename.snake_case}.#{options[:name]}" ), 
+          input( :name => "#{instance.class.basename.snake_case}.#{options[:name]}", 
             :type => :text, :value => instance.send( options[:name] ) )
         end
       end

@@ -43,35 +43,36 @@ end
 
 namespace :waves do
   
-  desc "freeze src=<wherever> to ./waves"
-  task :freeze do
-
-    target = "#{Dir.pwd}/waves"
-    src = ENV['src']
-    raise "Please specify the location of waves using src=wherever" unless src
-    raise "No directory found at '#{src}'" unless File.directory?(src) 
-      
-    items = FileList["#{src}/*"]
-    puts "Freezing from: #{src}"
-    items.each do |item|
-      puts "copying #{item}"
-      cp_r item, target
-    end
-    
-  end
-  
   desc "unfreeze (i.e. delete) the waves source at ./waves"
-  task :unfreeze do
+  task :thaw do
     frozen = "#{Dir.pwd}/waves"
     rm_r frozen if File.exist?(frozen)
   end
   
-  # Convenience task to allow you to freeze the current Waves
-  # source without knowing where it is.  This task only gets
-  # defined when the Rakefile successfully loaded Waves and if
-  # there's nothing in the way at ./waves
-  if defined?(WAVES) && !File.exist?("#{Dir.pwd}/waves")
-    namespace :freeze do
+  namespace :freeze do
+    
+    desc "freeze source=<wherever> to ./waves"
+    task :using do
+
+      target = "#{Dir.pwd}/waves"
+      src = ENV['source']
+      raise "Please specify the location of waves using src=wherever" unless src
+      raise "No directory found at '#{src}'" unless File.directory?(src) 
+      
+      items = FileList["#{src}/*"]
+      puts "Freezing from: #{src}"
+      items.each do |item|
+        puts "copying #{item}"
+        cp_r item, target
+      end
+    
+    end
+  
+    # Convenience task to allow you to freeze the current Waves
+    # source without knowing where it is.  This task only gets
+    # defined when the Rakefile successfully loaded Waves and if
+    # there's nothing in the way at ./waves
+    if defined?(WAVES) && !File.exist?("#{Dir.pwd}/waves")
       desc "freeze current Waves source to ./waves"
       task :current do
         target = "#{Dir.pwd}/waves"
@@ -82,9 +83,7 @@ namespace :waves do
           puts "copying #{item}"
           cp_r item, target
         end
-
       end
     end
   end
-  
 end

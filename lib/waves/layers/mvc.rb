@@ -6,6 +6,10 @@ module Waves
         
         require 'waves/layers/mvc/extensions'
         require 'waves/layers/mvc/controllers'
+        require 'hoshi'
+        require 'waves/helpers/basic'
+        require 'waves/helpers/formatting'
+        require 'waves/helpers/form'
         
         app.auto_create_module( :Models ) do
           auto_create_class :Default
@@ -33,8 +37,16 @@ module Waves
           auto_load true, :directories => [ :controllers ]          
         end
 
+        # We autoload helpers and so forth to emulate Rails technique
+        # of having an application-level helper (Default) and then one
+        # per view class. However, we only use this with templated views
+        # (since mixing in a helper module is sometimes a bit tricky).
+        # "Native" Waves views (aka Hoshi) are ordinary classes so they
+        # don't really need this, but you can always just include a class
+        # level helper and it will automatically pick up your defaults
+        # if it is not explicitly defined.
         app.auto_create_module( :Helpers ) do
-          auto_create_module( :Default ) { include Waves::Helpers::Extended }
+          auto_create_module( :Default )
           auto_load :Default, :directories => [ :helpers ]
           auto_create_module( true ) { include app::Helpers::Default }
           auto_load true, :directories => [ :helpers ]

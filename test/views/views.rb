@@ -2,14 +2,20 @@ require "#{here = File.dirname(__FILE__)}/../helpers.rb"
 require 'waves/foundations/classic'
 require 'waves/layers/renderers/erubis'
 require 'waves/layers/renderers/markaby'
+require 'waves/views/templated'
 require 'fileutils'
 
 
-describe "A class which has included Waves::Views::Mixin" do
+describe "A class which has included Waves::Views::Templated" do
   
     
     before do
-      Test = Module.new { include Waves::Foundations::Classic }
+      Test = Module.new { 
+        include Waves::Foundations::Classic 
+      }
+      Test::Views::Default.class_eval {
+        include Waves::Views::Templated
+      }
       Dir.chdir(here) do      
         FileUtils.rm_rf "templates" if File.exist? "templates"
         FileUtils.mkdir_p "templates/test"

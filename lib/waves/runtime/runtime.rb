@@ -1,10 +1,7 @@
 module Waves
 
-  # A temporary measure until the applications "array" becomes a hash.
-  # Currently used to keep track of all loaded Waves applications.
   class Applications < Array
-    # @todo Yeah, uh, this does not work this way. --rue
-    def []( name ) ; self.find { |app| app == name.to_s.camel_case } ; end
+    def []( name ) ; self.find { |app| app.name.snake_case.to_sym == name } ; end
   end
 
   def self.config; instance.config ; end
@@ -16,9 +13,7 @@ module Waves
   def self.main ; applications.first ; end
 
   # Register a module as a Waves application.
-  def self.<< ( app )
-    applications << app if Module === app
-  end
+  def self.<< ( app ) ; applications << app ; end
 
   # Returns the most recently created instance of Waves::Runtime.
   def self.instance ; Waves::Runtime.instance ; end
@@ -30,8 +25,8 @@ module Waves
     cache_method_missing name, "instance.#{name}( *args, &block)", *args, &block
   end
 
-  # A Waves::Runtime takes an inert application module and gives it concrete, pokeable form.
-  # Waves::Server and Waves::Console are types of runtime.
+  # Waves::Runtime is a base (abstract) class, not intended for direct use.
+  # Typically, you'll want to use Waves::Console or Waves::Server.
   class Runtime
 
     class << self; attr_accessor :instance; end
@@ -44,6 +39,10 @@ module Waves
       @options = options
       Dir.chdir options[:directory] if options[:directory]
       Runtime.instance = self
+      #config.dependencies.each do |d| 
+      #  gem d[:name], d[:version]
+      #  require d[:load] if d[:load]
+      #end
     end
 
     # The 'mode' of the runtime determines which configuration it will run under.

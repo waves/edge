@@ -28,14 +28,11 @@ module Waves
         self.send( ext, File.read(file), assigns.merge!( :request => request ))
       end
 
-        # Render the template with the name of the missing method.
-        # E.g. App::Views::Gnome.new.stink would look for templates/gnome/stink
-        def method_missing(name,*args) ; render( name, *args ) ; end
-      end
+      # Render the template with the name of the missing method.
+      # E.g. App::Views::Gnome.new.stink would look for templates/gnome/stink
+      def method_missing(name,*args) ; render( name, *args ) ; end
 
     end
-
-    class Base ; include Mixin ; end
 
   end
 
