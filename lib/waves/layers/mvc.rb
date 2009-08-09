@@ -37,6 +37,7 @@ module Waves
           auto_load true, :directories => [ :controllers ]          
         end
 
+        #
         # We autoload helpers and so forth to emulate Rails technique
         # of having an application-level helper (Default) and then one
         # per view class. However, we only use this with templated views
@@ -45,6 +46,8 @@ module Waves
         # don't really need this, but you can always just include a class
         # level helper and it will automatically pick up your defaults
         # if it is not explicitly defined.
+        #
+        
         app.auto_create_module( :Helpers ) do
           auto_create_module( :Default )
           auto_load :Default, :directories => [ :helpers ]

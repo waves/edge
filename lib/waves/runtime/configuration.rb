@@ -62,7 +62,12 @@ module Waves
       attribute( :console )
 
       # are there any gems we need to check for on startup?
-      attributes( :dependencies )
+      def self.dependencies( list )
+        list.each do |d| 
+          gem d[:name], d[:version]
+          require d[:load] if d[:load]
+        end
+      end
 
       # Provides access to the Waves::MimeTypes class via the configuration. You
       # can override #mime_types to return your own MIME types repository class.

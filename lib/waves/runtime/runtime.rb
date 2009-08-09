@@ -39,10 +39,6 @@ module Waves
       @options = options
       Dir.chdir options[:directory] if options[:directory]
       Runtime.instance = self
-      #config.dependencies.each do |d| 
-      #  gem d[:name], d[:version]
-      #  require d[:load] if d[:load]
-      #end
     end
 
     # The 'mode' of the runtime determines which configuration it will run under.
@@ -52,7 +48,7 @@ module Waves
     def debug? ; options[:debugger] or config.debug ; end
 
     # Returns the current configuration.
-    def config ; Waves.main::Configurations[ mode ] ; end
+    def config ; Waves.main[:configurations][ mode ] ; end
 
     # Reload the modules specified in the current configuration.
     def reload ; config.reloadable.each { |mod| mod.reload } ; end
