@@ -14,6 +14,8 @@ module Waves
 
         require 'waves/layers/mvc'
         require 'waves/layers/text/inflect/english'
+        require 'waves/views/templated'
+        require 'waves/layers/renderers/erubis'
         
         app.module_eval do
 
@@ -42,7 +44,6 @@ module Waves
           include Waves::Layers::Text::Inflect::English
           include Waves::Layers::MVC
           include Waves::Renderers::Erubis   
-          include Waves::Renderers::Markaby   
           
         end
         

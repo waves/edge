@@ -25,6 +25,10 @@ module Waves
             include Waves::Helpers::Formatting
             include Waves::Helpers::Form
           end
+          auto_create_class :Templated do
+            include Waves::Views::Mixin
+            include Waves::Views::Templated
+          end
           auto_load :Default, :directories => [ :views ]
           auto_create_class true, :Default
           auto_load true, :directories => [ :views ]

@@ -1,7 +1,6 @@
 # Utility methods mixed into String.
-    
-class String
-  
+module Waves::Ext::String
+
   # Syntactic sugar for using File.join to concatenate the argument to the receiver.
   #
   #   require "lib" / "utilities" / "string"
@@ -66,5 +65,9 @@ class String
       end
     }
   end
-  
+
+end
+
+class String
+  include Waves::Ext::String
 end

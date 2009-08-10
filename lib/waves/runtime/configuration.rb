@@ -89,7 +89,7 @@ module Waves
         application.use( middleware, options )
       end
       
-      def dispatcher( dispatcher )
+      def self.dispatcher( dispatcher )
         application.run( dispatcher.new )
       end
 
