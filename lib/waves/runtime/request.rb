@@ -124,9 +124,14 @@ module Waves
 
     # File extension of path, with leading dot
     def extension
-      @ext ||= ( if ( e = File.extname( path )).empty? then nil else e end )
+      @ext ||= ( ( e = File.extname( path ) ).empty? ? nil : e )
     end
+    
     alias :ext :extension
+
+    def basename
+      @basename ||= File.basename( path )
+    end
 
     module Utilities
 

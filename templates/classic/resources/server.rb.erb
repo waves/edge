@@ -3,6 +3,9 @@ module <%= @name %>
     class Server
       include Waves::Resources::Mixin
       
+      def get
+        view(:pages).welcome
+      end
     end
   end
 end

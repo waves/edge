@@ -10,6 +10,7 @@ module Waves
 
       def initialize( request )
         @request = request
+        super()
       end
 
     end

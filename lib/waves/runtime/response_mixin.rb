@@ -31,24 +31,18 @@ module Waves
       define_method( m ) { request.send( m ) }
     end
     
-    # Issue a redirect for the given location.
     def redirect(location, status = '302'); request.redirect(location, status); end
-    # Access the Waves::Logger.
+
     def log; Waves::Logger; end
-    # access stuff from an app
-    def app_name ; self.class.rootname.snake_case.to_sym ; end
-    def app ; eval(  "::#{app_name.to_s.camel_case}" ) ; end    
+
+    def app ; self.class.root ; end
+
+    def main ; Waves.main ; end
+
     def paths( rname = nil )
       ( rname ? app::Resources[ rname ].paths : resource.class.paths ).new
     end
 
-    # these take strings or operate on the path by default
-    def basename( str = nil ) ; ( str or path ).sub(/\.([^\.]+)$/,'') ; end
-
-    def extension( str = nil )
-      ( m = ( str or path ).match(/\.([^\.]+)$/) ) ? m[1] : nil
-    end
-    
   end
 
 end

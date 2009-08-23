@@ -19,7 +19,7 @@ module Waves
         end
 
         app.auto_create_module( :Views ) do
-          auto_create_class :Default, Hoshi::View[:html4_transitional] do
+          auto_create_class :Default, Hoshi::View[:html4] do
             include Waves::Views::Mixin
             include Waves::Helpers::Basic
             include Waves::Helpers::Formatting

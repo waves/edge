@@ -1,0 +1,39 @@
+require 'waves/helpers/css'
+
+class <%= @name %>::Views::Pages < <%= @name %>::Views::Default
+  
+  include Waves::Views::Mixin
+  include Waves::Helpers::Css
+  
+  def stylesheet
+    style {
+      css {
+        body {
+          font_family 'sans-serif'
+          width '800px'
+          margin '20px auto'
+        }
+      }
+    }
+  end
+  
+  def layout
+    doctype
+    html {
+      head { stylesheet }
+      body { yield }
+    }
+  end
+  
+  def welcome
+    layout {
+      h1 'Welcome To The <%= @name %> Application'
+      p {
+        raw "This is an empty Waves application. The good news is that Waves is " <<
+             "up and running just fine. Next, you should add your own resources. "
+        a "Find out how.", :href => 'http://rubywaves.com/'
+      }
+    }
+  end
+  
+end

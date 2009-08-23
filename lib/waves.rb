@@ -1,6 +1,5 @@
-# TODO: Move ALL of this stuff where it is needed to avoid
-#       unnecessary dependencies.
-
+require 'yaml'
+YAML::load_file( File.expand_path( File.dirname( __FILE__ )) + '/../dependencies.yml' ).each { |name,version| gem name, version }
 # External Dependencies
 require "rubygems"
 require 'rack'

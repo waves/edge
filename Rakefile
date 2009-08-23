@@ -5,21 +5,7 @@ rescue LoadError => e
   raise e
 end
 
-runtime_deps = {:rack => '~> 0.4',
-                'rack-cache' => '~> 0.2',
-                :extensions => '~> 0.6',
-                :english => '~> 0.3',
-                :live_console => '~> 0.2',
-                :functor => '>= 0.5.0',
-                :rakegen => '~> 0.6',
-                :autocode => '>= 1.0.0',
-                :filebase => '>= 0.3.5',
-                :RedCloth => '~> 4.0',
-                :choice => '~> 0.1',
-                :metaid => '~> 1.0',
-                :daemons => '~>1.0.10'
-               }
-
+runtime_deps = YAML::load_file( 'dependencies.yml' )
 developer_deps = { :bacon => '~> 1.0', :facon => '~> 0.4' }
 
 gem = Gem::Specification.new do |gem|
@@ -98,23 +84,6 @@ task "edge:gemspec" => :gemspec do
   end
 end
 
-desc "Publish to RubyForge"
-task( :publish => [ :package, :rdoc_publish ] ) do
-  `rubyforge login`
-  `rubyforge add_release #{gem.name} #{gem.name} #{gem.version} #{gem.name}-#{gem.version}.gem`
-end
-
-task( :rdoc_publish => :rdoc ) do
-  path = "/var/www/gforge-projects/#{gem.name}/"
-  `rsync -a --delete ./doc/rdoc/ dyoder67@rubyforge.org:#{path}`
-end
-
-Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = 'doc/rdoc'
-  rdoc.options << '--line-numbers' << '--inline-source' << '--main' << 'doc/README'
-  rdoc.rdoc_files.add [ 'lib/**/*.rb', 'doc/*' ]
-end
-
 # based on a blog post by Assaf Arkin
 desc "Set up dependencies so you can work from source"
 task( :setup ) do
@@ -168,4 +137,16 @@ end
 
 desc "Run all specs and tests."
 task :spec => %w[ test specs:run ]
+
+
+Rake::RDocTask.new do |rdoc|
+  rdoc.rdoc_dir = 'doc/rdoc'
+  rdoc.options << '--line-numbers' << '--inline-source' << '--main' << 'doc/README'
+  rdoc.rdoc_files.add [ 'lib/**/*.rb', 'doc/*' ]
+end
+
+task( :rdoc_publish => :rdoc ) do
+  path = "/var/www/gforge-projects/#{gem.name}/"
+  `rsync -a --delete ./doc/rdoc/ dyoder67@rubyforge.org:#{path}`
+end
 

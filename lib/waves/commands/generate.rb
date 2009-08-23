@@ -1,4 +1,5 @@
 require 'choice'
+gem 'rakegen', '=0.6.6'
 require 'rakegen'
 
 waves = File.expand_path( File.dirname( __FILE__ ) / '..' / '..' / '..' )

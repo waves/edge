@@ -29,12 +29,14 @@ module Waves
 
     def controller( resource = nil )
       resource ||= self.class.basename.snake_case
-      @controller ||= app::Controllers[ resource ].new( @request )
+      @controller ||= {}
+      @controller[resource] ||= app::Controllers[ resource ].new( @request )
     end
     
     def view( resource = nil )
       resource ||= self.class.basename.snake_case
-      @view ||= app::Views[ resource ].new( @request )
+      @view ||= {}
+      @view[resource] ||= app::Views[ resource ].new( @request )
     end
 
     # MVC Params get automatically destructured with the keys as accessors methods.

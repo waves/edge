@@ -9,9 +9,7 @@ module Waves
 
       def self.included( app )
 
-        gem 'dyoder-autocode', '~> 1.0.1'
         require 'autocode'
-
         require 'waves/layers/mvc'
         require 'waves/layers/text/inflect/english'
         require 'waves/views/templated'

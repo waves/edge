@@ -1,3 +1,4 @@
+gem 'choice', 
 require 'choice'
 
 Choice.options do
