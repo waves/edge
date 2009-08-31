@@ -6,16 +6,12 @@ module Waves
     class Unauthorized < RuntimeError; end
     class BadRequest < RuntimeError; end
 
-    # Redirect exceptions are rescued by the Waves dispatcher and used to set the
-    # response status and location.
-    class Redirect < StandardError
+    # Redirects are raised by applications and rescued by the Waves 
+    # dispatcher and used to set the response status and location.
+    class Redirect
       attr_reader :path, :status
       def initialize( path, status = '302' )
-        @path = path
-        @status = status
-      end
-      def message
-        "location: #{@path} status: #{@status}"
+        @path = path; @status = status
       end
     end
 
@@ -33,7 +29,7 @@ module Waves
       # As with any Rack application, a Waves dispatcher must provide a call method
       # that takes an +env+ hash.
       def call( env )
-        response = if Waves.synchronize? or Waves.debug?
+        response = if Waves.synchronize? || Waves.debug?
           Waves.synchronize { Waves.reload ; _call( env )  }
         else
           _call( env )

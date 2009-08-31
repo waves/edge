@@ -4,7 +4,8 @@ module Waves
       def self.included( app )
         app.module_eval {
           const_set( :Resources, Module.new {
-            const_set( :Map, Class.new {
+            const_set( :Server, Class.new {
+
               include Waves::Resources::Mixin
 
               handler( Exception ) do |e|
@@ -35,11 +36,11 @@ module Waves
               #server Waves::Servers::Mongrel
 
               application.use Rack::Session::Cookie,
-              	:key => 'rack.session',
-        		# :domain => 'foo.com',
-        		:path => '/',
-        		:expire_after => 2592000,
-        		:secret => 'Change it'
+                :key => 'rack.session',
+                # :domain => 'foo.com',
+                :path => '/',
+                :expire_after => 2592000,
+                :secret => 'Change it'
             })
           })
         }

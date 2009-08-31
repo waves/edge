@@ -4,8 +4,10 @@ module Waves
 
     class Default < Base
 
+      #
       # Takes a Waves::Request and returns a Waves::Response
       #
+      
       def safe(request)
         # safeish default
         request.response.content_type =  Waves::MimeTypes[request.ext].first || 'text/html'
