@@ -37,6 +37,6 @@ module Waves
   end
 end
 
-class Integer 
+class Integer  # :nodoc:
   include Waves::Ext::Integer
 end

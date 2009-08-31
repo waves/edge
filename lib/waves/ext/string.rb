@@ -68,6 +68,6 @@ module Waves::Ext::String
 
 end
 
-class String
+class String  # :nodoc:
   include Waves::Ext::String
 end
