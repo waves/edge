@@ -2,21 +2,21 @@ require 'waves/runtime/mocks'
 
 module Waves
 
-  class Console < Runtime
+  class Console
 
-    class << self
-
-      attr_reader :console
-
-      def load( options={} )
-        @console ||= Waves::Console.new( options )
-        Kernel.load( options[:startup] || 'startup.rb' )
-        Object.instance_eval { include Waves::Mocks }
-      end
-
-      # allow Waves::Console to act as The Console Instance
-      def method_missing(*args); @console.send(*args); end
-
+    attr_accessor :runtime 
+    
+    include Waves::Runtime
+    
+    def self.load( options={} )
+      Object.instance_eval { include Waves::Mocks }
+      new( options )
+    end
+    
+    
+    def initialize( options = {} )
+      @options = options
+      load # load the runtime
     end
 
   end

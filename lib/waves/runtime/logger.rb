@@ -24,9 +24,9 @@ module Waves
       self
     end
     
-    # Forwards logging methods to the logger.
-    def self.method_missing(name,*args,&block)
-      cache_method_missing name, "@log.#{name} *args, &block if @log", *args, &block
+    class << self
+      extend Forwardable
+      def_delegators :@log, *%w( debug info warn error )
     end
 
   end

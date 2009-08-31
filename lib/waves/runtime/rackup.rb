@@ -9,24 +9,26 @@ module Waves
   #
   # Your config.ru file should minimally look something like this:
   #
-  #   WAVES = ENV["WAVES"] || File.join(File.dirname(__FILE__), "waves", "lib")
-  #
-  #   $LOAD_PATH.unshift WAVES
-  #
   #   require "waves"
   #   require "waves/runtime/rackup"
   #
-  #   run Waves::Rackup.load(:startup => "run_giraffe_run.rb")
+  #   run Waves::Rackup.load
   #
-  class Rackup < Runtime
+  class Rackup
+    
+    attr_accessor :options
+    
+    include Waves::Runtime
 
-    # Create a runtime, run the startup file and return an application.
-    #
+    # Load the runtime and return an application.
     def self.load(options = {})
-      new options
-      Kernel.load(options[:startup] || "startup.rb")
-
-      Waves.config.application.to_app
+      new( options )
+      config.application.to_app
+    end
+    
+    def initialize( options = {} )
+      @options = options
+      load # load runtime
     end
 
   end

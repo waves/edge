@@ -1,24 +1,26 @@
 module Waves
 
-  class Server < Worker
+  class Server < Hive::Worker
 
+    include Waves::Runtime
+    
+    def initialize( options = {} )
+      super( options )
+      load # load the runtime
+    end
+    
     def start_tasks
-      @server = config.server.new(application, host, port)
+      @server = config.server.new( application, host, port )
       @server.start
     end
 
-    def stop_tasks ; @server.stop ; end
+    def stop_tasks() ; @server.stop ; end
 
     private
 
-    # The application defined.
-    #
-    def application()
-      @app ||= config.application.to_app
-    end
-
-    def port ; @port ||= options[:port] or config.port ; end
-    def host ; @host ||= options[:host] or config.host ; end
+    def application() ; @app ||= config.application.to_app ; end
+    def port() ; ( @port ||= options[:port] || config.port ) ; end
+    def host() ; ( @host ||= options[:host] || config.host ) ; end
 
   end
 

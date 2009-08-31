@@ -35,9 +35,16 @@ module Waves
     def finish ;  @response.finish ; end
 
     # Methods not explicitly defined by Waves::Response are delegated to Rack::Response.
-    # Check the Rack documentation for more informations
-    def method_missing(name,*args)
-      cache_method_missing name, "@response.#{name} *args", *args
+    # Check the Rack documentation for more information
+    extend Forwardable
+    def method_missing( name, *args )
+      if @response.respond_to?( name )
+        # avoid having to use method missing in the future
+        self.class.class_eval { def_delegator :@response, name }
+        @response.send( name, *args )
+      else
+        super
+      end
     end
 
   end

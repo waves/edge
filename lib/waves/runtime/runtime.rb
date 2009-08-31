@@ -1,44 +1,17 @@
+require 'forwardable'
+
 module Waves
 
-  class Applications < Array
-    def []( name ) ; self.find { |app| app.name.snake_case.to_sym == name } ; end
-  end
-
-  def self.config; instance.config ; end
-
-  # The list of all loaded applications
-  def self.applications ; @applications ||= Applications.new ; end
-
-  # Access the principal Waves application.
-  def self.main ; applications.first ; end
-
-  # Register a module as a Waves application.
-  def self.<< ( app ) ; applications << app ; end
-
-  # Returns the most recently created instance of Waves::Runtime.
-  def self.instance ; Waves::Runtime.instance ; end
-
-  def self.version ; File.read( File.expand_path( "#{File.dirname(__FILE__)}/../../../doc/VERSION" ) ) ; end
-  def self.license ; File.read( File.expand_path( "#{File.dirname(__FILE__)}/../../../doc/LICENSE" ) ) ; end
-
-  def self.method_missing(name,*args,&block)
-    cache_method_missing name, "instance.#{name}( *args, &block)", *args, &block
-  end
-
-  # Waves::Runtime is a base (abstract) class, not intended for direct use.
-  # Typically, you'll want to use Waves::Console or Waves::Server.
-  class Runtime
+  module Runtime
 
     class << self; attr_accessor :instance; end
 
-    # Accessor for options passed to the runtime.
-    attr_reader :options
-
     # Create a new Waves application instance.
-    def initialize( options={} )
-      @options = options
-      Dir.chdir options[:directory] if options[:directory]
+    def load
+      Dir.chdir( options[:directory] ) if options[:directory]
+      Kernel.load( options[:startup] || 'startup.rb' )
       Runtime.instance = self
+      options[:logger] ||= logger
     end
 
     # The 'mode' of the runtime determines which configuration it will run under.
@@ -54,12 +27,22 @@ module Waves
     def reload ; config.reloadable.each { |mod| mod.reload } ; end
 
     # Start and / or access the Waves::Logger instance.
-    def log ; @log ||= Waves::Logger.start ; end
+    def logger ; @log ||= Waves::Logger.start ; end
 
     # Provides access to the server mutex for thread-safe operation.
     def synchronize( &block ) ; ( @mutex ||= Mutex.new ).synchronize( &block ) ; end
     def synchronize? ; !options[ :turbo ] ; end
 
+  end
+  
+  class << self 
+    
+    # Returns the most recently created instance of Waves::Runtime.
+    def instance ; Waves::Runtime.instance ; end
+  
+    extend Forwardable
+    def_delegators :instance, *%w( mode debug? config reload logger synchronize synchronize? )
+    
   end
 
 end
