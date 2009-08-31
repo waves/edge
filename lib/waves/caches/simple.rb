@@ -1,12 +1,11 @@
 module Waves
 
   module Caches
-    
-    #
-    # This class is more or less here to establish the basic interface for caching and for
-    # lightweight caching that doesn't require a dedicated caching process.
-    #
-    
+
+    # A simple in-memory cache. This also serves as the base class
+    # for all the Waves caching implementations, so that descendents
+    # only need to override #initialize, #fetch, #store, #delete, and
+    # #clear, since the other methods are defined in terms of those.
     class Simple
       
       def initialize( hash = {} ) ; @cache = hash ; end
@@ -20,6 +19,6 @@ module Waves
       def clear ; @cache = {} ; end
       
     end
-
+    
   end
 end

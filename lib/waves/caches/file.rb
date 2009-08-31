@@ -3,6 +3,7 @@ require 'waves/caches/synchronized'
 module Waves
   module Caches
 
+    # A file-based cache, where the keys are the filenames.    
     class File < Simple
 
       def initialize( args )
@@ -34,6 +35,7 @@ module Waves
       
     end
     
+    # A thread-safe version of the File-based cache.
     class SynchronizedFile < Synchronized
       
       def initialize( args )

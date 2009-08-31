@@ -4,7 +4,8 @@ module Waves
   module Caches
     
     #
-    # This is just a proxy for the real cache, but adds Waves synchronization
+    # This is just a proxy for the real cache, but adds Waves synchronization. Pass the cache you
+    # want to use when you create the cache.
     #
     
     class Synchronized
@@ -19,7 +20,20 @@ module Waves
       def delete( key ) ; synchronize { @cache.delete( key ) } ; end
       def clear ; synchronize { @cache.clear } ; end
       def synchronize( &block ) ; Waves.synchronize( &block ) ; end
+      
     end
+    
+    
+    # A thread-safe version of the in-memory cache.
+    class SynchronizedSimple < Synchronized
+      
+      def initialize( args )
+        super( Simple.new( args ) )
+      end
+      
+    end
+    
+    
 
   end
 end
