@@ -27,6 +27,9 @@ module Waves
         :xhtml2 => "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n"
       }
 
+      # Allows you to generate a doctype declaration. Note that if you'll only
+      # need this helper if you're not using Hoshi, since Hoshi already provides
+      # this built-in.
       def doctype(type) ; self << DOCTYPES[type||:html4_strict] ; end
       
     end

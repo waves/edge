@@ -18,7 +18,8 @@ module Waves
     module Form
 
       def editor( instance, options = {}) 
-        { :method => :put, :buttons => true, :heading => instance.class.name.in_words.title_case }.merge( options )
+        options = { :method => :put, :buttons => true, 
+          :heading => instance.class.name.in_words.title_case }.merge( options )
         h1 options[:heading] if options[:heading]
         form( :method => :post, :action => paths.put( instance.key ) ) {
           input( :type => :hidden, :name => :_method, :value => :put ) if options[:method] == :put
