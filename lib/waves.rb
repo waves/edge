@@ -17,6 +17,7 @@ require 'benchmark'
 require 'base64'
 require 'functor'
 require 'filebase'
+require 'hive/worker'
 require 'filebase/model'
 
 # selected project-specific extensions
@@ -38,8 +39,8 @@ require 'waves/dispatchers/base'
 require 'waves/dispatchers/default'
 require 'waves/runtime/logger'
 require 'waves/runtime/mime_types'
+require 'waves/runtime/applications'
 require 'waves/runtime/runtime'
-require 'waves/runtime/worker'
 require 'waves/runtime/accept'
 require 'waves/runtime/request'
 require 'waves/runtime/response'
@@ -65,3 +66,7 @@ require 'waves/views/mixin'
 require 'waves/views/errors'
 require 'waves/renderers/mixin'
 
+module Waves
+  def self.version ; File.read( File.expand_path( "#{File.dirname(__FILE__)}/../doc/VERSION" ) ) ; end
+  def self.license ; File.read( File.expand_path( "#{File.dirname(__FILE__)}/../doc/LICENSE" ) ) ; end
+end

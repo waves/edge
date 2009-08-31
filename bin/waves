@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 
 # WARNING: This strange preamble might look easy to clean-up, but it is needed
-# to work with older versions of gems (< 1.2).
+# to work with older versions of gems (< 1.2). Also allows for local versions of
+# Waves to be used instead of the gem.
 
 require 'rubygems'
 
