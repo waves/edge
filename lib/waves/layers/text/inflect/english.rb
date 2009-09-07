@@ -15,6 +15,11 @@ module Waves
               def plural ; basename.snake_case.plural ; end
             end
             
+            Waves::ResponseMixin.module_eval do
+              def singular ; self.class.basename.snake_case.singular ; end
+              def plural ; self.class.basename.snake_case.plural ; end
+            end
+
             Waves::Resources::Mixin.module_eval do
               def singular ; self.class.singular ; end
               def plural ; self.class.plural ; end

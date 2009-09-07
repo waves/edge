@@ -1,18 +1,4 @@
-class <%= @name %>::Views::Pages < Blog::Views::Default
-  
-  include Waves::Views::Mixin
-  
-  def stylesheet
-    style { view(:css).default }
-  end
-  
-  def layout
-    doctype
-    html {
-      head { stylesheet }
-      body { yield }
-    }
-  end
+class <%= @name %>::Views::Pages < <%= @name %>::Views::Default
   
   def welcome
     layout {

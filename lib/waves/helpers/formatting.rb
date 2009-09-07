@@ -6,7 +6,7 @@ module Waves
 
       # Treat content as Textile.
       def textile( content )
-        self << ::RedCloth.new( content ).to_html
+        raw ::RedCloth.new( content ).to_html
       end
 
     end
