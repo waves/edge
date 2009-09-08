@@ -33,7 +33,6 @@ module Waves
             auto_load true, :directories => [ :resources ]
             auto_eval :Server do
               handler( Waves::Dispatchers::NotFoundError ) do
-                request.response.content_type = 'text/html'
                 app::Views::Errors.new( request ).not_found_404
               end
             end

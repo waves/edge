@@ -18,7 +18,7 @@ class Cassy
     text_decoration text_indent text_shadow text_transform top unicode_bidi vertical_align visibility voice_family volume white_space widows width
     word_spacing z_index )
   
-  METHODS = %w( class instance_eval send __send__ __id__ )
+  METHODS = %w( class include extend instance_eval send __send__ __id__ )
   instance_methods.each { |m| undef_method( m ) unless METHODS.include? m }
   
   methods =  HTML_TAGS.each do |tag|

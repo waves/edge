@@ -3,7 +3,7 @@ module Waves
   module Resources
 
     StatusCodes = {
-      Waves::Dispatchers::NotFoundError => 404
+      Waves::Dispatchers::NotFoundError => '404'
     }
 
 
@@ -96,6 +96,7 @@ module Waves
               before ;  rval = send( request.method ) ; after
             rescue => e
               response.status = ( StatusCodes[ e.class ] || 500 )
+              response.content_type = 'text/html'
               rval = handler( e )
             ensure
               always

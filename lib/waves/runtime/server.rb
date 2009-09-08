@@ -5,6 +5,7 @@ module Waves
     include Waves::Runtime
     
     def initialize( options = {} )
+      require 'ruby-debug' if options[:debugger]
       super( options )
       load # load the runtime
     end
