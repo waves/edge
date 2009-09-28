@@ -17,8 +17,7 @@ module Waves
     def initialize(env)
       @traits = Class.new { include Attributes }.new( :waves => {} )
       @request = Rack::Request.new(env).freeze
-      @response = Waves::Response.new self
-      @session = Waves::Session.new self
+      @response = Waves::Response.new( self )
     end
 
     # Rack request object.
@@ -31,6 +30,20 @@ module Waves
     %w( url scheme host port body query_string content_type media_type content_length referer ).each do |m|
       define_method( m ) { @request.send( m ) }
     end
+
+    # access common HTTP headers as methods
+    %w( user_agent cache_control ).each do |name|
+      key = "HTTP_#{name.to_s.upcase}"
+      define_method( name ) { @request.env[ key ] if @request.env.has_key?( key ) } 
+    end
+    
+    def if_modified_since
+      @if_modified_since ||= 
+        ( Time.parse( @request.env[ 'HTTP_IF_MODIFIED_SINCE' ] ) if 
+          @request.env.has_key?( 'HTTP_IF_MODIFIED_SINCE' ) ) 
+    end
+
+    def []( key ) ; @request.env[ key.to_s ] ; end
 
     # The request path (PATH_INFO). Ex: +/entry/2008-01-17+
     def path ; @request.path_info ; end
@@ -53,32 +66,6 @@ module Waves
       @method ||= ( ( ( m = @request.request_method.downcase ) == 'post' and
         ( n = @request['_method'] ) ) ? n.downcase : m ).intern
     end
-
-    def []( key ) ; @request.env[ key.to_s.upcase ] ; end
-
-    # access HTTP headers as methods
-    def method_missing( name, *args, &body )
-      if args.empty? and not body
-        cache_method_missing name, <<-CODE, *args, &body
-          key = "HTTP_#{name.to_s.upcase}"
-          @request.env[ key ] if @request.env.has_key?( key )
-        CODE
-      else
-        super
-      end
-    end
-
-
-    # Raise a not found exception.
-    def not_found
-      raise Waves::Dispatchers::NotFoundError, "#{@request.url} not found."
-    end
-
-    # Issue a redirect for the given path.
-    def redirect( path, status = '302' )
-      raise Waves::Dispatchers::Redirect.new( path, status )
-    end
-
 
     # Requested representation MIME type
     def accept()

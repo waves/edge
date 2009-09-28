@@ -32,7 +32,7 @@ module Waves
             auto_create_class true, :Default
             auto_load true, :directories => [ :resources ]
             auto_eval :Server do
-              handler( Waves::Dispatchers::NotFoundError ) do
+              handler( Waves::Response::ClientErrors::NotFound ) do
                 app::Views::Errors.new( request ).not_found_404
               end
             end

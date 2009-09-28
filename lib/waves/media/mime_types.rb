@@ -10,8 +10,7 @@ module Waves
   # Each extension may have multiple types. Originally
   # taken from Mongrel.
   #
-  # @see  MimeExts
-  #
+
   MimeTypes = Hash.new {|h, k| h[k] = [] }
 
   # Build up MimeTypes

@@ -12,7 +12,7 @@ module Waves
                 Waves.debug? ? raise( e ) : Waves::Views::Errors.new( request ).server_error_500
               end
 
-              handler( Waves::Dispatchers::NotFoundError ) do |e|
+              handler( Waves::Response::ClientErrors::NotFound ) do |e|
                 Waves.debug? ? raise( e ) : Waves::Views::Errors.new( request ).not_found_404
               end
 

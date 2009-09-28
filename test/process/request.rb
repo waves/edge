@@ -44,13 +44,13 @@ describe "Request Object" do
   feature "Initiate redirect using #redirect" do
     lambda { 
       Waves::Request.new(  env( '/', :method => 'GET' ) ).redirect('/')
-    }.should.raise( Waves::Dispatchers::Redirect )
+    }.should.raise( Waves::Redirects::Found )
   end
   
-  feature "Raise NotFoundError using #not_found" do
+  feature "Raise NotFound using #not_found" do
     lambda { 
       Waves::Request.new(  env( '/', :method => 'GET' ) ).not_found
-    }.should.raise( Waves::Dispatchers::NotFoundError )
+    }.should.raise( Waves::Response::ClientErrors::NotFound )
   end
 
   feature "Access to content_type, media_type, and content_length" do

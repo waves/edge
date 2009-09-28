@@ -9,10 +9,7 @@ module Waves
       #
       
       def safe(request)
-        # safeish default
-        request.response.content_type =  Waves::MimeTypes[ request.ext ].first || 'text/html'
-        result = Waves.config.resource.new( request ).process
-        request.response.write( result.to_s ) if request.response.body.empty?
+        Waves.config.resource.new( request ).process
       end
 
     end

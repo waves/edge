@@ -2,11 +2,6 @@ module Waves
 
   module Resources
 
-    StatusCodes = {
-      Waves::Dispatchers::NotFoundError => '404'
-    }
-
-
     module Mixin
 
       attr_reader :request
@@ -94,9 +89,8 @@ module Waves
           def process
             begin
               before ;  rval = send( request.method ) ; after
-            rescue => e
-              response.status = ( StatusCodes[ e.class ] || 500 )
-              response.content_type = 'text/html'
+            rescue Exception => e
+              e.call( response ) if e.respond_to?( :call )
               rval = handler( e )
             ensure
               always

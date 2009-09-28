@@ -60,6 +60,9 @@ module Waves
 
       # do you want to run a console thread (ex: LiveConsole)
       attribute( :console )
+      
+      # what dispatcher do you want to use
+      attribute( :dispatcher )
 
       # are there any gems we need to check for on startup?
       def self.dependencies( list )
@@ -89,10 +92,6 @@ module Waves
         application.use( middleware, options )
       end
       
-      def self.dispatcher( dispatcher )
-        application.run( dispatcher.new )
-      end
-
       # default options
       debug false
       log :level => :info, :output => $stderr
@@ -100,6 +99,7 @@ module Waves
       dependencies []
       server Waves::Servers::WEBrick
       application.use ::Rack::ShowExceptions
+      dispatcher Waves::Dispatchers::Default
 
     end
   end

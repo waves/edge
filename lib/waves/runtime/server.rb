@@ -19,7 +19,12 @@ module Waves
 
     private
 
-    def application() ; @app ||= config.application.to_app ; end
+    def application()
+      @app ||= begin
+        config.application.run( config.dispatcher.new )
+        config.application.to_app
+      end
+    end
     def port() ; ( @port ||= options[:port] || config.port ) ; end
     def host() ; ( @host ||= options[:host] || config.host ) ; end
 

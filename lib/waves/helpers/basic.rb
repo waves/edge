@@ -1,7 +1,7 @@
 module Waves
   module Helpers
     module Basic
-
+      
       # Escape a string as HTML content.
       def escape_html(s); Rack::Utils.escape_html(s); end
 

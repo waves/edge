@@ -8,7 +8,7 @@ module Waves
       def textile( content )
         raw ::RedCloth.new( content ).to_html
       end
-
+      
     end
   end
 end

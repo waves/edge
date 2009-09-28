@@ -27,12 +27,10 @@ module Waves
         request.query.merge( captured.to_h ) : request.query ) 
     end
     
-    %w( session path url domain not_found ).each do | m |
+    %w( session path url domain ).each do | m |
       define_method( m ) { request.send( m ) }
     end
     
-    def redirect(location, status = '302'); request.redirect(location, status); end
-
     def log; Waves::Logger; end
 
     def app ; self.class.root ; end
@@ -43,6 +41,30 @@ module Waves
       ( rname ? app::Resources[ rname ].paths : resource.class.paths ).new
     end
 
+    def http_cache( last_modified )
+      response.last_modified = last_modified
+      modified?( last_modified ) ? yield : not_modified
+    end
+
+    def modified?( last_modified )
+      request.if_modified_since.nil? || 
+        last_modified > request.if_modified_since
+    end
+    
+    # Raise a not found exception.
+    def not_found
+      raise Waves::Response::ClientErrors::NotFound.new
+    end
+
+    # Issue a redirect for the given path.
+    def redirect( path )
+      raise Waves::Response::Redirects::Found.new( path )
+    end
+
+    def not_modified
+      raise Waves::Response::Redirects::NotModified.new
+    end
+    
   end
 
 end

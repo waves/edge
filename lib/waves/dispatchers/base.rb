@@ -2,19 +2,6 @@ module Waves
 
   module Dispatchers
 
-    class NotFoundError < RuntimeError ; end
-    class Unauthorized < RuntimeError; end
-    class BadRequest < RuntimeError; end
-
-    # Redirects are raised by applications and rescued by the Waves 
-    # dispatcher and used to set the response status and location.
-    class Redirect
-      attr_reader :path, :status
-      def initialize( path, status = '302' )
-        @path = path; @status = status
-      end
-    end
-
     #
     # Waves::Dispatchers::Base provides the basic request processing structure
     # for a Rack application. It creates a Waves request, determines whether
@@ -47,14 +34,17 @@ module Waves
         response = request.response
         t = Benchmark.realtime do
           begin
-            safe( request )
-          rescue Dispatchers::Redirect => redirect
-            response.status = redirect.status
-            response.location = redirect.path
+            response.write( safe( request ).to_s ) if response.body.empty?
+          rescue Waves::Response::Packaged => e
+            e.call( response ) if e.respond_to?( :call )
+          else
+            # safeish default
+            response.content_type ||=  Waves::MimeTypes[ request.ext ].first || 'text/html'
+            response.status ||= '200'
           end
         end
-        Waves::Logger.info "#{request.method}: #{request.url} handled in #{(t*1000).round} ms."
-        return response.finish
+        Waves::Logger.info "#{response.status}: #{request.method} #{request.url} handled in #{(t*1000).round} ms."
+        response.finish
       end
 
     end
