@@ -9,7 +9,7 @@ module <%= @name %>
   include Waves::Layers::ORM::<%= @orm.camel_case %>
   <% end %>
   module Resources
-    module Server
+    class Server
       on( true ) { 'Hello, from Waves!' }
     end
   end
