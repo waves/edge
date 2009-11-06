@@ -8,4 +8,9 @@ module <%= @name %>
   <% if @orm %>
   include Waves::Layers::ORM::<%= @orm.camel_case %>
   <% end %>
+  module Resources
+    module Server
+      on( true ) { 'Hello, from Waves!' }
+    end
+  end
 end
