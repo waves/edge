@@ -23,25 +23,19 @@ module Waves
               log :level => :debug
               host '127.0.0.1'
               port 3000
+              use Rack::Session::Pool, :expire_after => 1.day
+              resource app::Resources::Server
+              dispatcher ::Waves::Dispatchers::Default
               server Waves::Servers::Mongrel
-              resource app::Resources::Map
 
-              application.run ::Waves::Dispatchers::Default.new
             })
             const_set( :Production, Class.new( self::Development ) {
               debug false
               log :level => :error, :output => ( "log.#{$$}" ), :rotation => :weekly
               port 80
               host '0.0.0.0'
-              #server Waves::Servers::Mongrel
 
-              application.use Rack::Session::Cookie,
-                :key => 'rack.session',
-                # :domain => 'foo.com',
-                :path => '/',
-                :expire_after => 2592000,
-                :secret => 'Change it'
-            })
+           })
           })
         }
         Waves << app

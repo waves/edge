@@ -1,4 +1,3 @@
-gem 'choice', 
 require 'choice'
 
 Choice.options do
@@ -29,7 +28,7 @@ begin
   require 'irb'
   require 'irb/completion'
   ARGV.clear
-  Waves.log.info "Runtime console starting ..."
+  Waves.logger.info "Runtime console starting ..."
   IRB.start
 rescue LoadError => e
   puts e.message

@@ -4,7 +4,7 @@ module Waves
 
   class Console
 
-    attr_accessor :runtime 
+    attr_accessor :options
     
     include Waves::Runtime
     
