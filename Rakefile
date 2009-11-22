@@ -21,7 +21,7 @@ gem = Gem::Specification.new do |gem|
   runtime_deps.each { | name, version | gem.add_runtime_dependency( name.to_s, version ) }
   developer_deps.each { |name, version| gem.add_development_dependency( name.to_s, version ) }
   gem.files = FileList[ 'templates/**/*', 'templates/**/.gitignore', 'lib/**/*.rb',
-    'lib/**/*.erb', "{doc,samples,templates,test}/**/*", 'lib/dependencies.yml' ]
+    'lib/**/*.erb', "{doc,samples,templates,test}/**/*", 'dependencies.yml' ]
   gem.has_rdoc = true
   gem.bindir = 'bin'
   gem.executables = [ 'waves' ]
