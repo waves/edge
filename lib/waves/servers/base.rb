@@ -16,6 +16,7 @@ module Waves
       
       # starts server, retrying every second until it succeeds
       def start
+        
         Thread.new do
           connect = false
           until connect do

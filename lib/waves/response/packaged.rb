@@ -8,7 +8,7 @@ module Waves
         end
       end
       def call( response )
-        response.status = status.to_s
+        response.status = status
       end
       def message
         "HTTP Reponse #{status}"

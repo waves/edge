@@ -40,7 +40,7 @@ module Waves
           else
             # safeish default
             response.content_type ||=  Waves::MimeTypes[ request.ext ].first || 'text/html'
-            response.status ||= '200'
+            response.status ||= 200
           end
         end
         Waves::Logger.info "#{response.status}: #{request.method} #{request.url} handled in #{(t*1000).round} ms."

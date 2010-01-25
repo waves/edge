@@ -16,8 +16,11 @@ module Waves
     end
 
     def rack_response; @response; end
-
-    %w( Status Content-Type Content-Length Cache-Control Location Expires ).each do |header|
+    
+    def status ; @response.status ; end
+    def status=(s) ; @response.status = s ; end
+    
+    %w( Content-Type Content-Length Cache-Control Location Expires ).each do |header|
       name = header.downcase.tr( '-','_' )
       define_method("#{name}=") {|val| @response[header] = val }
       define_method("#{name}") { @response[header] }

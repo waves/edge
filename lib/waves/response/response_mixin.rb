@@ -42,13 +42,19 @@ module Waves
     end
 
     def http_cache( last_modified )
+      response.cache_control ||= 'public'
       response.last_modified = last_modified
       modified?( last_modified ) ? yield : not_modified
     end
 
     def modified?( last_modified )
-      request.if_modified_since.nil? || 
+      if request.if_modified_since
+        Waves.logger.debug "If-Modified-Since: #{request.if_modified_since}."
+        Waves.logger.debug "Last modified: #{last_modified}."
         last_modified > request.if_modified_since
+      else
+        true
+      end
     end
     
     # Raise a not found exception.

@@ -1,7 +1,9 @@
 require 'yaml'
-YAML::load_file( File.expand_path( File.dirname( __FILE__ )) + '/../dependencies.yml' ).each { |name,version| gem name, version }
-# External Dependencies
+
 require "rubygems"
+YAML::load_file( File.expand_path( File.dirname( __FILE__ )) + '/../dependencies.yml' ).each { |name,version| gem name, version }
+
+# External Dependencies
 require 'rack'
 require 'rack/cache'
 require 'daemons'

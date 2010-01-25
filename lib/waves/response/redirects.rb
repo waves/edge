@@ -23,9 +23,8 @@ module Waves
       class NotModified < Packaged[304]
         include Redirect
         def call ( response )
-          %w( Allow Content-Encoding Content-Language Content-Length Content-MD5
-                Content-Type Last-Modified ).each { |h| response.headers.delete( h ) }
-          response.cache_control = 'public'
+          %w( Allow Content-Encoding Transfer-Encoding Content-Language 
+             Content-Length Content-MD5 Content-Type Last-Modified ).each { |h| response.headers.delete( h ) }
           response.body = []
           super( response )
         end
